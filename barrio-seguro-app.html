@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f0f1a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Barrio Seguro</title>
+<link rel="manifest" href="manifest.json">
+<style>
+  /* ===== RESET & BASE ===== */
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overflow: hidden; font-family: -apple-system, 'Segoe UI', sans-serif; }
+  body { background: #0f0f1a; color: #f0f0ff; }
+  input, button, textarea { font-family: inherit; }
+  button { cursor: pointer; border: none; background: none; }
+
+  /* ===== CSS VARIABLES ===== */
+  :root {
+    --red: #e53e3e;
+    --red-light: rgba(229,62,62,0.15);
+    --red-border: rgba(229,62,62,0.35);
+    --bg: #0f0f1a;
+    --bg2: #16162a;
+    --bg3: #1e1e35;
+    --bg4: #252542;
+    --text: #f0f0ff;
+    --muted: #8888aa;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --green: #38a169;
+    --green-light: rgba(56,161,105,0.15);
+    --gold: #d4a017;
+    --gold-light: rgba(212,160,23,0.15);
+    --blue: #3182ce;
+    --blue-light: rgba(49,130,206,0.15);
+    --radius: 14px;
+    --radius-sm: 10px;
+  }
+
+  /* ===== APP SHELL ===== */
+  #app { height: 100vh; display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; position: relative; overflow: hidden; }
+
+  /* ===== PAGES ===== */
+  .page { display: none; flex-direction: column; flex: 1; overflow: hidden; animation: fadeIn 0.25s ease; }
+  .page.active { display: flex; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ===== STATUS BAR ===== */
+  .status-bar { background: var(--bg2); padding: 10px 20px 6px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--muted); border-bottom: 0.5px solid var(--border); flex-shrink: 0; }
+  .status-bar .app-name { color: var(--red); font-weight: 600; letter-spacing: 0.5px; font-size: 11px; }
+
+  /* ===== SCROLLABLE CONTENT ===== */
+  .scroll-content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  .scroll-content::-webkit-scrollbar { display: none; }
+
+  /* ===== BOTTOM NAV ===== */
+  .bottom-nav { background: var(--bg2); border-top: 0.5px solid var(--border2); padding: 8px 0 16px; display: flex; flex-shrink: 0; }
+  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px; transition: opacity 0.15s; }
+  .nav-item:active { opacity: 0.7; }
+  .nav-icon { font-size: 22px; line-height: 1; }
+  .nav-label { font-size: 10px; color: var(--muted); letter-spacing: 0.3px; }
+  .nav-item.active .nav-label { color: var(--red); }
+  .nav-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--red); margin: 0 auto; opacity: 0; }
+  .nav-item.active .nav-dot { opacity: 1; }
+
+  /* ===== HEADER ===== */
+  .page-header { background: var(--bg2); padding: 16px 20px; border-bottom: 0.5px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; }
+  .page-header h1 { font-size: 18px; font-weight: 600; color: var(--text); }
+  .page-header p { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* ===== BADGES ===== */
+  .badge { font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 500; }
+  .badge-green { background: var(--green-light); color: #68d391; border: 0.5px solid rgba(56,161,105,0.3); }
+  .badge-red { background: var(--red-light); color: #fc8181; border: 0.5px solid var(--red-border); }
+  .badge-gold { background: var(--gold-light); color: #f6e05e; border: 0.5px solid rgba(212,160,23,0.3); }
+  .badge-blue { background: var(--blue-light); color: #90cdf4; border: 0.5px solid rgba(49,130,206,0.3); }
+
+  /* ===== CARDS ===== */
+  .card { background: var(--bg3); border: 0.5px solid var(--border2); border-radius: var(--radius); padding: 14px 16px; }
+
+  /* ===== AVATAR ===== */
+  .avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+
+  /* ===== INPUTS ===== */
+  .input-group { margin-bottom: 16px; }
+  .input-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; display: block; }
+  .input-field { width: 100%; background: var(--bg3); border: 0.5px solid var(--border2); border-radius: var(--radius-sm); padding: 14px 16px; color: var(--text); font-size: 15px; outline: none; transition: border-color 0.2s; }
+  .input-field:focus { border-color: var(--red); }
+  .input-field::placeholder { color: var(--muted); }
+
+  /* ===== BUTTONS ===== */
+  .btn-primary { width: 100%; background: var(--red); color: white; border-radius: var(--radius); padding: 16px; font-size: 16px; font-weight: 600; transition: transform 0.1s, opacity 0.1s; letter-spacing: 0.3px; }
+  .btn-primary:active { transform: scale(0.98); opacity: 0.9; }
+  .btn-secondary { width: 100%; background: var(--bg3); color: var(--muted); border: 0.5px solid var(--border2); border-radius: var(--radius); padding: 14px; font-size: 14px; transition: background 0.15s; }
+  .btn-secondary:active { background: var(--bg4); }
+
+  /* ===== DIVIDER ===== */
+  .divider { height: 0.5px; background: var(--border); margin: 12px 0; }
+
+  /* ===================== */
+  /* === LOGIN PAGE ===    */
+  /* ===================== */
+  #page-login { background: var(--bg); justify-content: center; align-items: center; padding: 2rem; }
+  .login-logo { text-align: center; margin-bottom: 2.5rem; }
+  .login-logo .shield { width: 80px; height: 80px; background: var(--red); border-radius: 22px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 42px; }
+  .login-logo h1 { font-size: 24px; font-weight: 700; letter-spacing: 2px; color: var(--text); }
+  .login-logo p { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .login-form { width: 100%; }
+  .login-link { text-align: center; color: var(--muted); font-size: 12px; margin-top: 20px; line-height: 1.6; }
+  .login-link span { color: var(--red); }
+
+  /* ===================== */
+  /* === HOME PAGE ===     */
+  /* ===================== */
+  #page-home { background: var(--bg); }
+  .home-scroll { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+
+  /* Welcome bar */
+  .welcome-bar { display: flex; align-items: center; justify-content: space-between; }
+  .welcome-text h2 { font-size: 18px; font-weight: 600; color: var(--text); }
+  .welcome-text p { font-size: 12px; color: var(--muted); margin-top: 3px; }
+  .online-pill { background: var(--green-light); color: #68d391; font-size: 12px; padding: 6px 12px; border-radius: 20px; border: 0.5px solid rgba(56,161,105,0.3); display: flex; align-items: center; gap: 6px; }
+  .online-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: blink 2s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* Alert button */
+  .alert-btn-wrap { position: relative; }
+  .alert-main-btn { width: 100%; background: var(--red); border-radius: 20px; padding: 28px 20px; border: none; cursor: pointer; position: relative; overflow: hidden; transition: transform 0.1s; }
+  .alert-main-btn:active { transform: scale(0.98); }
+  .alert-pulse { position: absolute; inset: 0; border-radius: 20px; background: rgba(255,255,255,0.08); animation: pulse-anim 2.5s infinite; }
+  @keyframes pulse-anim { 0%,100%{opacity:0.5;transform:scale(1)} 50%{opacity:0;transform:scale(1.04)} }
+  .alert-btn-content { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .alert-btn-icon { font-size: 48px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4)); }
+  .alert-btn-title { color: white; font-size: 20px; font-weight: 700; letter-spacing: 0.5px; }
+  .alert-btn-sub { color: rgba(255,255,255,0.75); font-size: 13px; }
+
+  /* Emergency row */
+  .emergency-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .emerg-btn { background: var(--bg3); border: 0.5px solid var(--border2); border-radius: var(--radius); padding: 14px 8px; display: flex; flex-direction: column; align-items: center; gap: 6px; transition: background 0.15s; text-decoration: none; }
+  .emerg-btn:active { background: var(--bg4); }
+  .emerg-btn.red-btn { border-color: var(--red-border); background: var(--red-light); }
+  .emerg-icon { font-size: 24px; }
+  .emerg-label { color: var(--text); font-size: 12px; font-weight: 600; }
+  .emerg-num { color: var(--muted); font-size: 10px; }
+
+  /* Section */
+  .section-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; padding: 0 2px; }
+
+  /* Vecino item */
+  .vecino-list { display: flex; flex-direction: column; gap: 8px; }
+  .vecino-item { background: var(--bg3); border: 0.5px solid var(--border2); border-radius: var(--radius); padding: 12px 14px; display: flex; align-items: center; gap: 12px; transition: background 0.15s; }
+  .vecino-item:active { background: var(--bg4); }
+  .vecino-info { flex: 1; min-width: 0; }
+  .vecino-name { font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .vecino-addr { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .status-dot.online { background: var(--green); }
+  .status-dot.offline { background: var(--muted); }
+
+  /* ===================== */
+  /* === ALERTA MODAL ===  */
+  /* ===================== */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(5,5,15,0.97); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; animation: fadeIn 0.3s ease; }
+  .modal-overlay.hidden { display: none; }
+  .alarm-ring { width: 100px; height: 100px; border-radius: 50%; background: var(--red-light); border: 2px solid var(--red); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; animation: alarm-pulse 1s infinite; font-size: 44px; }
+  @keyframes alarm-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(229,62,62,0.5)} 50%{box-shadow:0 0 0 24px rgba(229,62,62,0)} }
+  .modal-title { color: var(--red); font-size: 22px; font-weight: 700; margin-bottom: 6px; letter-spacing: 1px; }
+  .modal-from { color: var(--text); font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+  .modal-addr { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+  .modal-msg { background: var(--bg3); border-radius: var(--radius); padding: 16px; margin-bottom: 24px; border: 0.5px solid var(--border2); }
+  .modal-msg p { color: var(--text); font-size: 15px; line-height: 1.6; }
+  .modal-time { color: var(--muted); font-size: 12px; margin-top: 8px; }
+  .modal-actions { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+  .btn-call911 { background: var(--red); color: white; border-radius: var(--radius); padding: 16px; font-size: 16px; font-weight: 700; letter-spacing: 0.5px; }
+  .btn-dismiss { background: var(--bg3); color: var(--muted); border: 0.5px solid var(--border2); border-radius: var(--radius); padding: 14px; font-size: 14px; }
+
+  /* ALERTA ENVIADA MODAL */
+  .send-modal { position: fixed; inset: 0; background: rgba(5,5,15,0.97); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; animation: fadeIn 0.3s ease; }
+  .send-modal.hidden { display: none; }
+  .send-icon { font-size: 64px; margin-bottom: 20px; animation: bounce 0.5s ease; }
+  @keyframes bounce { 0%{transform:scale(0.5)} 70%{transform:scale(1.1)} 100%{transform:scale(1)} }
+  .send-title { color: var(--text); font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+  .send-sub { color: var(--muted); font-size: 14px; line-height: 1.6; margin-bottom: 32px; }
+  .send-counter { font-size: 36px; font-weight: 700; color: var(--red); }
+  .send-counter-label { color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+  /* TIPO ALERTA MODAL */
+  .tipo-modal { position: fixed; inset: 0; background: rgba(5,5,15,0.95); z-index: 999; display: flex; flex-direction: column; padding: 2rem; animation: slideUp 0.3s ease; }
+  .tipo-modal.hidden { display: none; }
+  @keyframes slideUp { from{transform:translateY(40px);opacity:0} to{transform:translateY(0);opacity:1} }
+  .tipo-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .tipo-sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+  .tipo-options { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .tipo-btn { background: var(--bg3); border: 0.5px solid var(--border2); border-radius: var(--radius); padding: 18px 16px; display: flex; align-items: center; gap: 14px; transition: background 0.15s; }
+  .tipo-btn:active { background: var(--bg4); }
+  .tipo-btn.danger { border-color: var(--red-border); background: var(--red-light); }
+  .tipo-btn-icon { font-size: 28px; flex-shrink: 0; }
+  .tipo-btn-text { text-align: left; }
+  .tipo-btn-label { color: var(--text); font-size: 15px; font-weight: 600; }
+  .tipo-btn-desc { color: var(--muted); font-size: 12px; margin-top: 3px; }
+  .btn-cancelar { background: var(--bg3); color: var(--muted); border: 0.5px solid var(--border2); border-radius: var(--radius); padding: 16px; font-size: 15px; margin-top: 14px; }
+
+  /* ======================== */
+  /* === HISTORIAL PAGE ===   */
+  /* ======================== */
+  #page-hist { background: var(--bg); }
+  .hist-list { display: flex; flex-direction: column; gap: 10px; padding: 16px; }
+  .hist-item { border-radius: var(--radius); overflow: hidden; background: var(--bg3); border: 0.5px solid var(--border2); }
+  .hist-accent { height: 3px; }
+  .hist-accent.roja { background: var(--red); }
+  .hist-accent.naranja { background: var(--gold); }
+  .hist-accent.azul { background: var(--blue); }
+  .hist-body { padding: 14px 16px; }
+  .hist-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+  .hist-tipo { font-size: 14px; font-weight: 600; color: var(--text); flex: 1; }
+  .hist-time { font-size: 11px; color: var(--muted); flex-shrink: 0; }
+  .hist-meta { font-size: 12px; color: var(--muted); }
+  .hist-estado { font-size: 11px; padding: 3px 8px; border-radius: 20px; }
+
+  /* ======================== */
+  /* === ADMIN PAGE ===       */
+  /* ======================== */
+  #page-admin { background: var(--bg); }
+  .admin-scroll { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .stat-card { background: var(--bg3); border: 0.5px solid var(--border2); border-radius: var(--radius); padding: 14px; text-align: center; }
+  .stat-num { font-size: 28px; font-weight: 700; color: var(--text); display: block; }
+  .stat-label { font-size: 11px; color: var(--muted); display: block; margin-top: 4px; }
+  .admin-vecino { background: var(--bg3); border: 0.5px solid var(--border2); border-radius: var(--radius); padding: 12px 14px; display: flex; align-items: center; gap: 12px; }
+  .admin-vecino-info { flex: 1; min-width: 0; }
+  .admin-vecino-name { font-size: 14px; font-weight: 600; color: var(--text); }
+  .admin-vecino-addr { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .admin-actions { display: flex; gap: 8px; }
+  .btn-icon { background: var(--bg4); border: 0.5px solid var(--border2); border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .btn-icon.red { background: var(--red-light); border-color: var(--red-border); }
+  .add-vecino-btn { background: var(--red); color: white; border-radius: var(--radius); padding: 16px; font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+  /* PLAN CARD */
+  .plan-card { background: linear-gradient(135deg, rgba(229,62,62,0.15) 0%, rgba(30,30,53,0) 100%); border: 0.5px solid var(--red-border); border-radius: var(--radius); padding: 16px; }
+  .plan-title { font-size: 13px; color: var(--red); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; }
+  .plan-price { font-size: 28px; font-weight: 700; color: var(--text); }
+  .plan-period { font-size: 13px; color: var(--muted); }
+  .plan-features { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+  .plan-feat { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+  .plan-feat span { color: var(--green); }
+
+  /* ======================== */
+  /* === PERFIL PAGE ===      */
+  /* ======================== */
+  #page-perfil { background: var(--bg); }
+  .perfil-scroll { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+  .perfil-header-card { background: var(--bg3); border: 0.5px solid var(--border2); border-radius: var(--radius); padding: 20px; display: flex; align-items: center; gap: 16px; }
+  .perfil-avatar { width: 60px; height: 60px; border-radius: 50%; background: var(--red-light); border: 2px solid var(--red-border); display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; color: #fc8181; flex-shrink: 0; }
+  .perfil-name { font-size: 18px; font-weight: 700; color: var(--text); }
+  .perfil-addr { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .perfil-role { margin-top: 8px; }
+  .settings-section { background: var(--bg3); border: 0.5px solid var(--border2); border-radius: var(--radius); overflow: hidden; }
+  .settings-item { padding: 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 0.5px solid var(--border); }
+  .settings-item:last-child { border-bottom: none; }
+  .settings-item-left { display: flex; align-items: center; gap: 12px; }
+  .settings-icon { font-size: 18px; }
+  .settings-label { font-size: 14px; color: var(--text); }
+  .settings-value { font-size: 13px; color: var(--muted); }
+  .toggle { width: 44px; height: 24px; background: var(--green); border-radius: 12px; position: relative; cursor: pointer; transition: background 0.2s; }
+  .toggle.off { background: var(--bg4); }
+  .toggle-thumb { width: 20px; height: 20px; background: white; border-radius: 50%; position: absolute; top: 2px; right: 2px; transition: right 0.2s; }
+  .toggle.off .toggle-thumb { right: auto; left: 2px; }
+  .logout-btn { background: var(--red-light); color: #fc8181; border: 0.5px solid var(--red-border); border-radius: var(--radius); padding: 16px; font-size: 15px; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ===== MODAL: ALERTA RECIBIDA ===== -->
+  <div class="modal-overlay hidden" id="alertModal">
+    <div class="alarm-ring">🚨</div>
+    <div class="modal-title">¡ALERTA VECINAL!</div>
+    <div class="modal-from" id="alertFrom">María González</div>
+    <div class="modal-addr" id="alertAddr">San Martín 847</div>
+    <div class="modal-msg">
+      <p id="alertMsg">Persona desconocida rondando la cuadra, mirando casas.</p>
+      <div class="modal-time" id="alertTime">Hace un momento</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-call911" onclick="callNumber('911')">📞 LLAMAR AL 911</button>
+      <button class="btn-dismiss" onclick="dismissAlert()">Entendido — estoy atento</button>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: TIPO DE ALERTA ===== -->
+  <div class="tipo-modal hidden" id="tipoModal">
+    <div class="tipo-title">¿Qué estás viendo?</div>
+    <div class="tipo-sub">Tu alerta llegará a todos los vecinos de la cuadra al instante</div>
+    <div class="tipo-options">
+      <button class="tipo-btn danger" onclick="sendAlert('Persona desconocida rondando', '🕵️')">
+        <span class="tipo-btn-icon">🕵️</span>
+        <div class="tipo-btn-text">
+          <div class="tipo-btn-label">Persona sospechosa</div>
+          <div class="tipo-btn-desc">Alguien desconocido rondando la cuadra</div>
+        </div>
+      </button>
+      <button class="tipo-btn danger" onclick="sendAlert('Intento de robo / robo en curso', '🚗')">
+        <span class="tipo-btn-icon">🚗</span>
+        <div class="tipo-btn-text">
+          <div class="tipo-btn-label">Robo / intento de robo</div>
+          <div class="tipo-btn-desc">Vehículo o persona en actitud de robo</div>
+        </div>
+      </button>
+      <button class="tipo-btn" onclick="sendAlert('Situación inusual en la cuadra', '👁️')">
+        <span class="tipo-btn-icon">👁️</span>
+        <div class="tipo-btn-text">
+          <div class="tipo-btn-label">Situación inusual</div>
+          <div class="tipo-btn-desc">Algo llamativo que requiere atención</div>
+        </div>
+      </button>
+      <button class="tipo-btn" onclick="sendAlert('Emergencia en mi domicilio', '🏠')">
+        <span class="tipo-btn-icon">🏠</span>
+        <div class="tipo-btn-text">
+          <div class="tipo-btn-label">Emergencia en mi casa</div>
+          <div class="tipo-btn-desc">Necesito ayuda de mis vecinos ahora</div>
+        </div>
+      </button>
+      <button class="tipo-btn" onclick="sendAlert('Vehículo sospechoso estacionado', '🚙')">
+        <span class="tipo-btn-icon">🚙</span>
+        <div class="tipo-btn-text">
+          <div class="tipo-btn-label">Vehículo sospechoso</div>
+          <div class="tipo-btn-desc">Auto sin identificación o merodeando</div>
+        </div>
+      </button>
+    </div>
+    <button class="btn-cancelar" onclick="closeTipoModal()">Cancelar</button>
+  </div>
+
+  <!-- ===== MODAL: ALERTA ENVIADA ===== -->
+  <div class="send-modal hidden" id="sendModal">
+    <div class="send-icon">✅</div>
+    <div class="send-title">¡Alerta enviada!</div>
+    <div class="send-sub">Todos los vecinos de la cuadra<br>fueron notificados al instante</div>
+    <div class="send-counter" id="sendCounter">12</div>
+    <div class="send-counter-label">vecinos notificados</div>
+    <div style="margin-top: 32px; width: 100%; display: flex; gap: 10px;">
+      <button class="btn-call911" style="flex:1" onclick="callNumber('911')">📞 Llamar 911</button>
+      <button class="btn-dismiss" style="flex:1" onclick="closeSendModal()">Cerrar</button>
+    </div>
+  </div>
+
+  <!-- ===== LOGIN PAGE ===== -->
+  <div class="page active" id="page-login">
+    <div class="login-logo">
+      <div class="shield">🛡️</div>
+      <h1>BARRIO SEGURO</h1>
+      <p>Red vecinal de seguridad privada</p>
+    </div>
+    <div class="login-form">
+      <div class="input-group">
+        <label class="input-label">Dirección de tu casa</label>
+        <input class="input-field" type="text" placeholder="Ej: San Martín 823" id="loginAddr" value="San Martín 823">
+      </div>
+      <div class="input-group">
+        <label class="input-label">Contraseña</label>
+        <input class="input-field" type="password" placeholder="••••••••" id="loginPass" value="12345">
+      </div>
+      <button class="btn-primary" onclick="doLogin()">Ingresar a la red</button>
+      <div class="login-link" style="margin-top:16px">
+        ¿No tenés acceso? Pedile al<br><span>administrador de tu cuadra</span> que te invite
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== HOME PAGE ===== -->
+  <div class="page" id="page-home">
+    <div class="status-bar">
+      <span id="currentTime">9:41</span>
+      <span class="app-name">BARRIO SEGURO</span>
+      <span>📶</span>
+    </div>
+    <div class="scroll-content">
+      <div class="home-scroll">
+
+        <!-- Welcome -->
+        <div class="welcome-bar">
+          <div class="welcome-text">
+            <h2 id="welcomeName">Carlos Pérez</h2>
+            <p id="welcomeAddr">San Martín 823</p>
+          </div>
+          <div class="online-pill">
+            <div class="online-dot"></div>
+            <span id="onlineCount">6 en línea</span>
+          </div>
+        </div>
+
+        <!-- BOTÓN PRINCIPAL DE ALERTA -->
+        <div class="alert-btn-wrap">
+          <button class="alert-main-btn" onclick="openTipoModal()">
+            <div class="alert-pulse"></div>
+            <div class="alert-btn-content">
+              <span class="alert-btn-icon">🚨</span>
+              <span class="alert-btn-title">ACTIVAR ALERTA VECINAL</span>
+              <span class="alert-btn-sub">Toca para alertar a toda la cuadra</span>
+            </div>
+          </button>
+        </div>
+
+        <!-- Emergencias -->
+        <div>
+          <div class="section-label" style="margin-bottom:10px">Llamadas de emergencia</div>
+          <div class="emergency-row">
+            <button class="emerg-btn red-btn" onclick="callNumber('911')">
+              <span class="emerg-icon">👮</span>
+              <span class="emerg-label">Policía</span>
+              <span class="emerg-num">911</span>
+            </button>
+            <button class="emerg-btn" onclick="callNumber('100')">
+              <span class="emerg-icon">🚒</span>
+              <span class="emerg-label">Bomberos</span>
+              <span class="emerg-num">100</span>
+            </button>
+            <button class="emerg-btn" onclick="callNumber('107')">
+              <span class="emerg-icon">🚑</span>
+              <span class="emerg-label">SAME</span>
+              <span class="emerg-num">107</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Vecinos -->
+        <div>
+          <div class="section-label" style="margin-bottom:10px">Vecinos de la cuadra</div>
+          <div class="vecino-list" id="vecinoList"></div>
+        </div>
+
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item active" onclick="goTo('home')">
+        <span class="nav-icon">🏠</span><div class="nav-dot"></div><span class="nav-label">Inicio</span>
+      </div>
+      <div class="nav-item" onclick="goTo('hist')">
+        <span class="nav-icon">📋</span><div class="nav-dot"></div><span class="nav-label">Historial</span>
+      </div>
+      <div class="nav-item" onclick="goTo('admin')">
+        <span class="nav-icon">⚙️</span><div class="nav-dot"></div><span class="nav-label">Admin</span>
+      </div>
+      <div class="nav-item" onclick="goTo('perfil')">
+        <span class="nav-icon">👤</span><div class="nav-dot"></div><span class="nav-label">Mi perfil</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== HISTORIAL PAGE ===== -->
+  <div class="page" id="page-hist">
+    <div class="status-bar">
+      <span id="currentTime2">9:41</span>
+      <span class="app-name">BARRIO SEGURO</span>
+      <span>📶</span>
+    </div>
+    <div class="page-header">
+      <div>
+        <h1>Historial</h1>
+        <p>Alertas de la cuadra</p>
+      </div>
+      <span class="badge badge-red">3 este mes</span>
+    </div>
+    <div class="scroll-content">
+      <div class="hist-list" id="histList"></div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="goTo('home')"><span class="nav-icon">🏠</span><div class="nav-dot"></div><span class="nav-label">Inicio</span></div>
+      <div class="nav-item active" onclick="goTo('hist')"><span class="nav-icon">📋</span><div class="nav-dot"></div><span class="nav-label">Historial</span></div>
+      <div class="nav-item" onclick="goTo('admin')"><span class="nav-icon">⚙️</span><div class="nav-dot"></div><span class="nav-label">Admin</span></div>
+      <div class="nav-item" onclick="goTo('perfil')"><span class="nav-icon">👤</span><div class="nav-dot"></div><span class="nav-label">Mi perfil</span></div>
+    </div>
+  </div>
+
+  <!-- ===== ADMIN PAGE ===== -->
+  <div class="page" id="page-admin">
+    <div class="status-bar">
+      <span>9:41</span>
+      <span class="app-name">BARRIO SEGURO</span>
+      <span>📶</span>
+    </div>
+    <div class="page-header">
+      <div>
+        <h1>Administrador</h1>
+        <p>San Martín al 800</p>
+      </div>
+      <span class="badge badge-blue">Admin</span>
+    </div>
+    <div class="scroll-content">
+      <div class="admin-scroll">
+
+        <!-- Plan actual -->
+        <div class="plan-card">
+          <div class="plan-title">Plan activo — Cuadra Pro</div>
+          <div>
+            <span class="plan-price">$5.000</span>
+            <span class="plan-period"> ARS / mes</span>
+          </div>
+          <div class="plan-features">
+            <div class="plan-feat"><span>✓</span> Hasta 50 vecinos</div>
+            <div class="plan-feat"><span>✓</span> Alertas ilimitadas</div>
+            <div class="plan-feat"><span>✓</span> Historial 12 meses</div>
+            <div class="plan-feat"><span>✓</span> Soporte prioritario</div>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div>
+          <div class="section-label" style="margin-bottom:10px">Estadísticas del mes</div>
+          <div class="stats-grid">
+            <div class="stat-card"><span class="stat-num">12</span><span class="stat-label">Casas</span></div>
+            <div class="stat-card"><span class="stat-num">9</span><span class="stat-label">Activas</span></div>
+            <div class="stat-card"><span class="stat-num">3</span><span class="stat-label">Alertas</span></div>
+          </div>
+        </div>
+
+        <!-- Vecinos -->
+        <div>
+          <div class="section-label" style="margin-bottom:10px">Vecinos registrados</div>
+          <div style="display:flex;flex-direction:column;gap:8px" id="adminVecinoList"></div>
+        </div>
+
+        <!-- Agregar -->
+        <button class="add-vecino-btn" onclick="alert('Funcionalidad: invitar nuevo vecino por código único')">
+          <span>➕</span> Agregar vecino a la cuadra
+        </button>
+
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="goTo('home')"><span class="nav-icon">🏠</span><div class="nav-dot"></div><span class="nav-label">Inicio</span></div>
+      <div class="nav-item" onclick="goTo('hist')"><span class="nav-icon">📋</span><div class="nav-dot"></div><span class="nav-label">Historial</span></div>
+      <div class="nav-item active" onclick="goTo('admin')"><span class="nav-icon">⚙️</span><div class="nav-dot"></div><span class="nav-label">Admin</span></div>
+      <div class="nav-item" onclick="goTo('perfil')"><span class="nav-icon">👤</span><div class="nav-dot"></div><span class="nav-label">Mi perfil</span></div>
+    </div>
+  </div>
+
+  <!-- ===== PERFIL PAGE ===== -->
+  <div class="page" id="page-perfil">
+    <div class="status-bar">
+      <span>9:41</span>
+      <span class="app-name">BARRIO SEGURO</span>
+      <span>📶</span>
+    </div>
+    <div class="page-header">
+      <div><h1>Mi perfil</h1><p>Configuración personal</p></div>
+    </div>
+    <div class="scroll-content">
+      <div class="perfil-scroll">
+
+        <div class="perfil-header-card">
+          <div class="perfil-avatar">CP</div>
+          <div>
+            <div class="perfil-name">Carlos Pérez</div>
+            <div class="perfil-addr">San Martín 823</div>
+            <div class="perfil-role"><span class="badge badge-blue">Administrador</span></div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-item">
+            <div class="settings-item-left">
+              <span class="settings-icon">🔔</span>
+              <span class="settings-label">Notificaciones push</span>
+            </div>
+            <div class="toggle" id="toggle1" onclick="toggleSwitch('toggle1')">
+              <div class="toggle-thumb"></div>
+            </div>
+          </div>
+          <div class="settings-item">
+            <div class="settings-item-left">
+              <span class="settings-icon">🔊</span>
+              <span class="settings-label">Alarma sonora</span>
+            </div>
+            <div class="toggle" id="toggle2" onclick="toggleSwitch('toggle2')">
+              <div class="toggle-thumb"></div>
+            </div>
+          </div>
+          <div class="settings-item">
+            <div class="settings-item-left">
+              <span class="settings-icon">📳</span>
+              <span class="settings-label">Vibración</span>
+            </div>
+            <div class="toggle" id="toggle3" onclick="toggleSwitch('toggle3')">
+              <div class="toggle-thumb"></div>
+            </div>
+          </div>
+          <div class="settings-item">
+            <div class="settings-item-left">
+              <span class="settings-icon">📍</span>
+              <span class="settings-label">Compartir ubicación</span>
+            </div>
+            <div class="toggle off" id="toggle4" onclick="toggleSwitch('toggle4')">
+              <div class="toggle-thumb"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-item">
+            <div class="settings-item-left">
+              <span class="settings-icon">🏠</span>
+              <span class="settings-label">Mi dirección</span>
+            </div>
+            <span class="settings-value">San Martín 823</span>
+          </div>
+          <div class="settings-item">
+            <div class="settings-item-left">
+              <span class="settings-icon">📱</span>
+              <span class="settings-label">Cuadra</span>
+            </div>
+            <span class="settings-value">San Martín al 800</span>
+          </div>
+          <div class="settings-item">
+            <div class="settings-item-left">
+              <span class="settings-icon">👥</span>
+              <span class="settings-label">Plan</span>
+            </div>
+            <span class="badge badge-red">Cuadra Pro</span>
+          </div>
+        </div>
+
+        <button class="logout-btn" onclick="doLogout()">Cerrar sesión</button>
+
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="goTo('home')"><span class="nav-icon">🏠</span><div class="nav-dot"></div><span class="nav-label">Inicio</span></div>
+      <div class="nav-item" onclick="goTo('hist')"><span class="nav-icon">📋</span><div class="nav-dot"></div><span class="nav-label">Historial</span></div>
+      <div class="nav-item" onclick="goTo('admin')"><span class="nav-icon">⚙️</span><div class="nav-dot"></div><span class="nav-label">Admin</span></div>
+      <div class="nav-item active" onclick="goTo('perfil')"><span class="nav-icon">👤</span><div class="nav-dot"></div><span class="nav-label">Mi perfil</span></div>
+    </div>
+  </div>
+
+</div><!-- end #app -->
+
+<script>
+// ===== DATOS DE EJEMPLO =====
+const VECINOS = [
+  { id:1, nombre:'María González', dir:'San Martín 847', iniciales:'MG', color:'#2d6a4f', colorText:'#68d391', online:true },
+  { id:2, nombre:'Jorge Rodríguez', dir:'San Martín 831', iniciales:'JR', color:'#1a365d', colorText:'#90cdf4', online:true },
+  { id:3, nombre:'Ana Pereyra', dir:'San Martín 855', iniciales:'AP', color:'#44337a', colorText:'#d6bcfa', online:true },
+  { id:4, nombre:'Luis Fernández', dir:'San Martín 819', iniciales:'LF', color:'#7b341e', colorText:'#fbd38d', online:false },
+  { id:5, nombre:'Claudia Méndez', dir:'San Martín 863', iniciales:'CM', color:'#2c4a2e', colorText:'#9ae6b4', online:true },
+  { id:6, nombre:'Pablo Torres', dir:'San Martín 811', iniciales:'PT', color:'#2a4365', colorText:'#bee3f8', online:false },
+  { id:7, nombre:'Susana López', dir:'San Martín 871', iniciales:'SL', color:'#5c2b29', colorText:'#fc8181', online:true },
+];
+
+const HISTORIAL = [
+  { tipo:'Persona sospechosa', icono:'🕵️', vecino:'María González', dir:'San Martín 847', tiempo:'Hace 2 horas', estado:'Resuelta', color:'roja' },
+  { tipo:'Vehículo sospechoso', icono:'🚗', vecino:'Jorge Rodríguez', dir:'San Martín 831', tiempo:'Ayer 22:14', estado:'Resuelta', color:'roja' },
+  { tipo:'Situación inusual', icono:'👁️', vecino:'Ana Pereyra', dir:'San Martín 855', tiempo:'Hace 3 días', estado:'Resuelta', color:'naranja' },
+  { tipo:'Emergencia en domicilio', icono:'🏠', vecino:'Carlos Pérez', dir:'San Martín 823', tiempo:'Hace 5 días', estado:'Resuelta', color:'azul' },
+];
+
+// ===== NAVEGACIÓN =====
+function goTo(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const navItems = document.querySelectorAll('#page-' + page + ' .nav-item');
+  // Encontrar el nav correcto
+  document.querySelectorAll('#page-' + page + ' .nav-item').forEach(n => {
+    if (n.querySelector('.nav-label') && n.querySelector('.nav-label').textContent.toLowerCase().includes(
+      page === 'home' ? 'inicio' : page === 'hist' ? 'historial' : page === 'admin' ? 'admin' : 'perfil'
+    )) n.classList.add('active');
+  });
+}
+
+// ===== LOGIN =====
+function doLogin() {
+  const addr = document.getElementById('loginAddr').value.trim();
+  if (!addr) return;
+  document.getElementById('page-login').classList.remove('active');
+  document.getElementById('page-home').classList.add('active');
+  updateTime();
+  renderVecinos();
+  renderHistorial();
+  renderAdminVecinos();
+  // Simular alerta entrante después de 4 segundos
+  setTimeout(() => showIncomingAlert(), 4000);
+}
+
+function doLogout() {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-login').classList.add('active');
+}
+
+// ===== RELOJ =====
+function updateTime() {
+  const now = new Date();
+  const t = now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
+  document.querySelectorAll('#currentTime, #currentTime2').forEach(el => { if(el) el.textContent = t; });
+}
+setInterval(updateTime, 30000);
+
+// ===== RENDER VECINOS HOME =====
+function renderVecinos() {
+  const list = document.getElementById('vecinoList');
+  list.innerHTML = VECINOS.map(v => `
+    <div class="vecino-item">
+      <div class="avatar" style="background:${v.color}20;color:${v.colorText}">${v.iniciales}</div>
+      <div class="vecino-info">
+        <div class="vecino-name">${v.nombre}</div>
+        <div class="vecino-addr">${v.dir}</div>
+      </div>
+      <div class="status-dot ${v.online ? 'online' : 'offline'}"></div>
+    </div>
+  `).join('');
+}
+
+// ===== RENDER HISTORIAL =====
+function renderHistorial() {
+  const list = document.getElementById('histList');
+  list.innerHTML = HISTORIAL.map(h => `
+    <div class="hist-item">
+      <div class="hist-accent ${h.color}"></div>
+      <div class="hist-body">
+        <div class="hist-header">
+          <div class="hist-tipo">${h.icono} ${h.tipo}</div>
+          <div class="hist-time">${h.tiempo}</div>
+        </div>
+        <div class="hist-meta">${h.vecino} · ${h.dir}</div>
+        <div style="margin-top:8px">
+          <span class="badge ${h.color === 'roja' ? 'badge-green' : 'badge-gold'}">${h.estado}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== RENDER ADMIN VECINOS =====
+function renderAdminVecinos() {
+  const list = document.getElementById('adminVecinoList');
+  const todos = [...VECINOS, 
+    { id:8, nombre:'Roberto Páez', dir:'San Martín 801', iniciales:'RP', color:'#5c2b29', colorText:'#fc8181', online:false, pendiente:true }
+  ];
+  list.innerHTML = todos.map(v => `
+    <div class="admin-vecino">
+      <div class="avatar" style="width:36px;height:36px;font-size:12px;background:${v.color}20;color:${v.colorText}">${v.iniciales}</div>
+      <div class="admin-vecino-info">
+        <div class="admin-vecino-name">${v.nombre}</div>
+        <div class="admin-vecino-addr">${v.dir}</div>
+      </div>
+      ${v.pendiente 
+        ? '<span class="badge badge-gold">Pendiente</span>'
+        : '<span class="badge badge-green">Activo</span>'
+      }
+    </div>
+  `).join('');
+}
+
+// ===== ALERTA - MODAL TIPO =====
+function openTipoModal() {
+  document.getElementById('tipoModal').classList.remove('hidden');
+}
+function closeTipoModal() {
+  document.getElementById('tipoModal').classList.add('hidden');
+}
+
+// ===== ENVIAR ALERTA =====
+function sendAlert(tipo, icono) {
+  closeTipoModal();
+  // Agregar al historial
+  HISTORIAL.unshift({ tipo, icono, vecino:'Carlos Pérez', dir:'San Martín 823', tiempo:'Ahora', estado:'Activa', color:'roja' });
+  renderHistorial();
+  // Mostrar confirmación
+  document.getElementById('sendModal').classList.remove('hidden');
+  // Sonido de alarma (beep con Web Audio API)
+  playAlarm();
+}
+
+function closeSendModal() {
+  document.getElementById('sendModal').classList.add('hidden');
+}
+
+// ===== ALERTA ENTRANTE (simulación) =====
+function showIncomingAlert() {
+  document.getElementById('alertFrom').textContent = 'María González';
+  document.getElementById('alertAddr').textContent = 'San Martín 847';
+  document.getElementById('alertMsg').textContent = 'Persona desconocida rondando la cuadra hace 20 minutos, mirando las casas.';
+  document.getElementById('alertTime').textContent = 'Hace un momento';
+  document.getElementById('alertModal').classList.remove('hidden');
+  playAlarm();
+}
+
+function dismissAlert() {
+  document.getElementById('alertModal').classList.add('hidden');
+}
+
+// ===== LLAMADAS =====
+function callNumber(num) {
+  window.location.href = 'tel:' + num;
+}
+
+// ===== ALARMA SONORA =====
+function playAlarm() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const playBeep = (freq, start, dur) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = freq;
+      osc.type = 'square';
+      gain.gain.setValueAtTime(0.3, ctx.currentTime + start);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + dur);
+      osc.start(ctx.currentTime + start);
+      osc.stop(ctx.currentTime + start + dur);
+    };
+    playBeep(880, 0, 0.15);
+    playBeep(660, 0.2, 0.15);
+    playBeep(880, 0.4, 0.15);
+    playBeep(660, 0.6, 0.15);
+    playBeep(880, 0.8, 0.3);
+  } catch(e) {}
+}
+
+// ===== TOGGLE SWITCHES =====
+function toggleSwitch(id) {
+  document.getElementById(id).classList.toggle('off');
+}
+</script>
+</body>
+</html>
