@@ -423,7 +423,8 @@ button { cursor:pointer; border:none; background:none; font-family:inherit; }
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import { getFirestore, collection, doc, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, query, where, orderBy } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { getFirestore, collection, doc, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-messaging.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAec7FF9qM5rCXYOwDTgd1CoAY7WvEyK9s",
@@ -436,6 +437,46 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const messaging = getMessaging(app);
+const VAPID_KEY = 'BEJBYuMjb2dmVs5zT91R3MpnZk7aYuSHbq7aAEKxayRHTv7k_QcXqzl3TFyinY8fjAtOH3xdaaMFfSwLcO6Z8A0';
+
+// Registrar service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/BARRIO-SEGURO/firebase-messaging-sw.js')
+    .catch(e => console.log('SW error:', e));
+}
+
+// Escuchar notificaciones con app abierta
+onMessage(messaging, (payload) => {
+  const { title, body } = payload.notification;
+  document.getElementById('rDe').textContent = title;
+  document.getElementById('rDir').textContent = '';
+  document.getElementById('rMsg').textContent = body;
+  document.getElementById('mRecv').classList.remove('hidden');
+  sonarAlarma();
+});
+
+async function pedirPermisosNotificacion() {
+  try {
+    const permiso = await Notification.requestPermission();
+    if (permiso === 'granted') {
+      const token = await getToken(messaging, { vapidKey: VAPID_KEY });
+      if (token && sesion) {
+        await setDoc(doc(db, 'cuadras', sesion.codigo, 'tokens', token), {
+          token, nombre: sesion.nombre, fecha: new Date().toISOString()
+        });
+      }
+    }
+  } catch(e) { console.log('Error permisos:', e); }
+}
+
+async function mandarNotificacionCuadra(titulo, cuerpo, codigoCuadra) {
+  try {
+    await addDoc(collection(db, 'alertas'), {
+      codigoCuadra, titulo, cuerpo, fecha: new Date().toISOString(), procesada: false
+    });
+  } catch(e) { console.log('Error alerta:', e); }
+}
 
 const COLORES = [
   {bg:'rgba(45,106,79,0.2)',txt:'#68d391'},{bg:'rgba(26,54,93,0.2)',txt:'#90cdf4'},
@@ -542,6 +583,7 @@ function arrancarApp() {
   if (sesion.esAdmin) document.getElementById('navAdminBtn').style.display = 'flex';
   irA('home');
   escucharVecinos();
+  pedirPermisosNotificacion();
 }
 
 // ===== ESCUCHAR VECINOS EN TIEMPO REAL =====
@@ -627,10 +669,17 @@ window.abrirTipo = function() {
   document.getElementById('mTipo').classList.remove('hidden');
 }
 
-window.enviarAlerta = function(tipo) {
+window.enviarAlerta = async function(tipo) {
   cerrar('mTipo');
-  document.getElementById('mSent').classList.remove('hidden');
   sonarAlarma();
+  document.getElementById('mSent').classList.remove('hidden');
+  if (sesion) {
+    await mandarNotificacionCuadra(
+      '🚨 Alerta de ' + sesion.nombre,
+      tipo + ' — ' + sesion.nombreCuadra,
+      sesion.codigo
+    );
+  }
 }
 
 window.llamar911 = function() {
