@@ -15,288 +15,135 @@
 
   #app { height: 100vh; display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; }
 
-  /* PAGES */
   .page { display: none; flex-direction: column; flex: 1; overflow: hidden; animation: fadeIn 0.2s ease; }
   .page.active { display: flex; }
   @keyframes fadeIn { from{opacity:0} to{opacity:1} }
 
-  /* SCROLL */
   .scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
   .scroll::-webkit-scrollbar { display: none; }
 
-  /* ===================== */
-  /*      LOGIN            */
-  /* ===================== */
-  #page-login {
-    background: #0f0f1a;
-    justify-content: center;
-    align-items: center;
-    padding: 2rem;
-    gap: 2rem;
-  }
-  .login-logo { text-align: center; }
-  .shield-icon {
-    width: 100px; height: 100px;
-    background: #e53e3e;
-    border-radius: 28px;
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 20px;
-    font-size: 56px;
-  }
-  .login-logo h1 { font-size: 30px; font-weight: 700; letter-spacing: 2px; }
-  .login-logo p { font-size: 18px; color: #8888aa; margin-top: 8px; }
+  /* LOGIN */
+  #page-login { background:#0f0f1a; justify-content:center; align-items:center; padding:2rem; gap:2rem; }
+  .login-logo { text-align:center; }
+  .shield-icon { width:100px; height:100px; background:#e53e3e; border-radius:28px; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:56px; }
+  .login-logo h1 { font-size:30px; font-weight:700; letter-spacing:2px; }
+  .login-logo p { font-size:18px; color:#8888aa; margin-top:8px; }
+  .login-form { width:100%; display:flex; flex-direction:column; gap:16px; }
+  .field-label { font-size:16px; color:#8888aa; display:block; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px; }
+  .field-input { width:100%; background:#1e1e35; border:1px solid rgba(255,255,255,0.12); border-radius:14px; padding:18px 20px; color:#f0f0ff; font-size:20px; outline:none; }
+  .field-input:focus { border-color:#e53e3e; }
+  .field-input::placeholder { color:#555577; }
+  .btn-ingresar { width:100%; background:#e53e3e; color:white; border-radius:16px; padding:22px; font-size:22px; font-weight:700; margin-top:8px; transition:transform 0.1s; }
+  .btn-ingresar:active { transform:scale(0.97); }
+  .login-nota { text-align:center; font-size:15px; color:#555577; line-height:1.6; }
+  .error-msg { color:#fc8181; font-size:15px; text-align:center; display:none; }
 
-  .login-form { width: 100%; display: flex; flex-direction: column; gap: 16px; }
-  .field-label { font-size: 16px; color: #8888aa; display: block; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .field-input {
-    width: 100%;
-    background: #1e1e35;
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 14px;
-    padding: 18px 20px;
-    color: #f0f0ff;
-    font-size: 20px;
-    outline: none;
-  }
-  .field-input:focus { border-color: #e53e3e; }
-  .field-input::placeholder { color: #555577; }
-
-  .btn-ingresar {
-    width: 100%;
-    background: #e53e3e;
-    color: white;
-    border-radius: 16px;
-    padding: 22px;
-    font-size: 22px;
-    font-weight: 700;
-    margin-top: 8px;
-    transition: transform 0.1s;
-  }
-  .btn-ingresar:active { transform: scale(0.97); }
-  .login-nota { text-align: center; font-size: 15px; color: #555577; line-height: 1.6; }
-
-  /* ===================== */
-  /*      HOME             */
-  /* ===================== */
-  #page-home { background: #0f0f1a; }
-
-  .top-bar {
-    background: #16162a;
-    padding: 18px 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.07);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-shrink: 0;
-  }
-  .top-bar .bienvenida { font-size: 20px; font-weight: 600; }
-  .top-bar .direccion { font-size: 15px; color: #8888aa; margin-top: 3px; }
-  .online-badge {
-    background: rgba(56,161,105,0.15);
-    border: 1px solid rgba(56,161,105,0.3);
-    color: #68d391;
-    font-size: 14px;
-    padding: 8px 14px;
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-  }
-  .dot-verde { width: 8px; height: 8px; border-radius: 50%; background: #38a169; animation: blink 2s infinite; }
+  /* TOP BAR */
+  .top-bar { background:#16162a; padding:18px 20px; border-bottom:1px solid rgba(255,255,255,0.07); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+  .top-bar .bienvenida { font-size:20px; font-weight:600; }
+  .top-bar .direccion { font-size:15px; color:#8888aa; margin-top:3px; }
+  .online-badge { background:rgba(56,161,105,0.15); border:1px solid rgba(56,161,105,0.3); color:#68d391; font-size:14px; padding:8px 14px; border-radius:20px; display:flex; align-items:center; gap:6px; flex-shrink:0; }
+  .dot-verde { width:8px; height:8px; border-radius:50%; background:#38a169; animation:blink 2s infinite; }
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-  .home-content { padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+  /* HOME */
+  #page-home { background:#0f0f1a; }
+  .home-content { padding:20px; display:flex; flex-direction:column; gap:20px; }
 
-  /* BOTON ALERTA GRANDE */
-  .btn-alerta {
-    width: 100%;
-    background: #e53e3e;
-    border-radius: 24px;
-    padding: 36px 20px;
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.1s;
-  }
-  .btn-alerta:active { transform: scale(0.97); }
-  .pulso {
-    position: absolute; inset: 0; border-radius: 24px;
-    background: rgba(255,255,255,0.06);
-    animation: pulso 2.5s infinite;
-  }
+  .btn-alerta { width:100%; background:#e53e3e; border-radius:24px; padding:36px 20px; position:relative; overflow:hidden; transition:transform 0.1s; }
+  .btn-alerta:active { transform:scale(0.97); }
+  .pulso { position:absolute; inset:0; border-radius:24px; background:rgba(255,255,255,0.06); animation:pulso 2.5s infinite; }
   @keyframes pulso { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0;transform:scale(1.03)} }
-  .alerta-inner { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 12px; }
-  .alerta-icono { font-size: 64px; }
-  .alerta-titulo { color: white; font-size: 26px; font-weight: 700; letter-spacing: 0.5px; }
-  .alerta-subtitulo { color: rgba(255,255,255,0.8); font-size: 17px; text-align: center; line-height: 1.4; }
+  .alerta-inner { position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; gap:12px; }
+  .alerta-icono { font-size:64px; }
+  .alerta-titulo { color:white; font-size:26px; font-weight:700; }
+  .alerta-subtitulo { color:rgba(255,255,255,0.8); font-size:17px; text-align:center; line-height:1.4; }
 
-  /* BOTON 911 */
-  .btn-911 {
-    width: 100%;
-    background: #16162a;
-    border: 2px solid rgba(229,62,62,0.4);
-    border-radius: 20px;
-    padding: 24px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    transition: background 0.15s;
-  }
-  .btn-911:active { background: #1e1e35; }
-  .btn-911-icono { font-size: 36px; }
-  .btn-911-texto { text-align: left; }
-  .btn-911-label { font-size: 22px; font-weight: 700; color: #f0f0ff; }
-  .btn-911-sub { font-size: 15px; color: #8888aa; margin-top: 3px; }
+  .btn-911 { width:100%; background:#16162a; border:2px solid rgba(229,62,62,0.4); border-radius:20px; padding:24px 20px; display:flex; align-items:center; justify-content:center; gap:16px; }
+  .btn-911:active { background:#1e1e35; }
+  .btn-911-icono { font-size:36px; }
+  .btn-911-label { font-size:22px; font-weight:700; color:#f0f0ff; }
+  .btn-911-sub { font-size:15px; color:#8888aa; margin-top:3px; }
 
-  /* SECCIÓN VECINOS */
-  .seccion-titulo { font-size: 18px; color: #8888aa; text-transform: uppercase; letter-spacing: 0.8px; }
-  .vecinos-lista { display: flex; flex-direction: column; gap: 10px; }
-  .vecino-card {
-    background: #1e1e35;
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 16px;
-    padding: 16px 18px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-  .vecino-avatar {
-    width: 50px; height: 50px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px; font-weight: 700;
-    flex-shrink: 0;
-  }
-  .vecino-nombre { font-size: 18px; font-weight: 600; color: #f0f0ff; }
-  .vecino-dir { font-size: 15px; color: #8888aa; margin-top: 3px; }
-  .vecino-estado { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; margin-left: auto; }
-  .online { background: #38a169; }
-  .offline { background: #444466; }
+  .seccion-titulo { font-size:18px; color:#8888aa; text-transform:uppercase; letter-spacing:0.8px; }
+  .vecinos-lista { display:flex; flex-direction:column; gap:10px; }
+  .vecino-card { background:#1e1e35; border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:16px 18px; display:flex; align-items:center; gap:14px; }
+  .vecino-avatar { width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; flex-shrink:0; }
+  .vecino-nombre { font-size:18px; font-weight:600; color:#f0f0ff; }
+  .vecino-dir { font-size:15px; color:#8888aa; margin-top:3px; }
+  .vecino-estado { width:12px; height:12px; border-radius:50%; flex-shrink:0; margin-left:auto; }
+  .st-online { background:#38a169; }
+  .st-offline { background:#444466; }
 
-  /* BOTTOM NAV — solo 2 items */
-  .bottom-nav {
-    background: #16162a;
-    border-top: 1px solid rgba(255,255,255,0.07);
-    padding: 10px 0 20px;
-    display: flex;
-    flex-shrink: 0;
-  }
-  .nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px; }
-  .nav-btn .nav-ico { font-size: 28px; }
-  .nav-btn .nav-txt { font-size: 13px; color: #8888aa; }
-  .nav-btn.activo .nav-txt { color: #e53e3e; }
-  .nav-btn .nav-punto { width: 5px; height: 5px; border-radius: 50%; background: #e53e3e; margin: 0 auto; opacity: 0; }
-  .nav-btn.activo .nav-punto { opacity: 1; }
+  /* PAGE HEADER */
+  .page-header { background:#16162a; padding:20px; border-bottom:1px solid rgba(255,255,255,0.07); flex-shrink:0; display:flex; align-items:center; justify-content:space-between; }
+  .page-header h1 { font-size:26px; font-weight:700; }
+  .page-header p { font-size:16px; color:#8888aa; margin-top:4px; }
 
-  /* ===================== */
-  /*   VECINOS PAGE        */
-  /* ===================== */
-  #page-vecinos { background: #0f0f1a; }
-  .page-header {
-    background: #16162a;
-    padding: 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.07);
-    flex-shrink: 0;
-  }
-  .page-header h1 { font-size: 26px; font-weight: 700; }
-  .page-header p { font-size: 16px; color: #8888aa; margin-top: 4px; }
-  .vecinos-scroll { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  /* ADMIN PAGE */
+  #page-admin { background:#0f0f1a; }
+  .admin-content { padding:16px; display:flex; flex-direction:column; gap:12px; }
+  .admin-vecino { background:#1e1e35; border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:14px 16px; display:flex; align-items:center; gap:12px; }
+  .admin-info { flex:1; }
+  .admin-nombre { font-size:17px; font-weight:600; }
+  .admin-dir { font-size:14px; color:#8888aa; margin-top:2px; }
+  .btn-eliminar { background:rgba(229,62,62,0.12); border:1px solid rgba(229,62,62,0.3); border-radius:10px; width:40px; height:40px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+  .btn-agregar { width:100%; background:#e53e3e; color:white; border-radius:16px; padding:20px; font-size:20px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:10px; }
+  .badge-admin { background:rgba(49,130,206,0.15); border:1px solid rgba(49,130,206,0.3); color:#90cdf4; font-size:13px; padding:6px 12px; border-radius:20px; }
 
-  /* ===================== */
-  /*   MODALES             */
-  /* ===================== */
+  /* BOTTOM NAV */
+  .bottom-nav { background:#16162a; border-top:1px solid rgba(255,255,255,0.07); padding:10px 0 20px; display:flex; flex-shrink:0; }
+  .nav-btn { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; padding:8px; }
+  .nav-btn .nav-ico { font-size:28px; }
+  .nav-btn .nav-txt { font-size:13px; color:#8888aa; }
+  .nav-btn.activo .nav-txt { color:#e53e3e; }
+  .nav-btn .nav-punto { width:5px; height:5px; border-radius:50%; background:#e53e3e; margin:0 auto; opacity:0; }
+  .nav-btn.activo .nav-punto { opacity:1; }
 
-  /* TIPO DE ALERTA */
-  .modal {
-    position: fixed; inset: 0;
-    background: rgba(5,5,15,0.96);
-    z-index: 100;
-    display: flex; flex-direction: column;
-    padding: 2rem;
-    animation: slideUp 0.25s ease;
-  }
-  .modal.oculto { display: none; }
+  /* MODALES */
+  .modal { position:fixed; inset:0; background:rgba(5,5,15,0.96); z-index:100; display:flex; flex-direction:column; padding:2rem; animation:slideUp 0.25s ease; }
+  .modal.oculto { display:none; }
   @keyframes slideUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
 
-  .modal-titulo { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
-  .modal-sub { font-size: 17px; color: #8888aa; margin-bottom: 24px; line-height: 1.5; }
-  .opciones { display: flex; flex-direction: column; gap: 12px; flex: 1; }
+  .modal-titulo { font-size:26px; font-weight:700; margin-bottom:8px; }
+  .modal-sub { font-size:17px; color:#8888aa; margin-bottom:24px; line-height:1.5; }
+  .opciones { display:flex; flex-direction:column; gap:12px; flex:1; }
+  .opcion-btn { background:#1e1e35; border:1px solid rgba(255,255,255,0.1); border-radius:18px; padding:20px 18px; display:flex; align-items:center; gap:16px; }
+  .opcion-btn:active { background:#252542; }
+  .opcion-btn.peligro { border-color:rgba(229,62,62,0.35); background:rgba(229,62,62,0.1); }
+  .opcion-ico { font-size:34px; flex-shrink:0; }
+  .opcion-label { font-size:18px; font-weight:600; color:#f0f0ff; text-align:left; }
+  .opcion-desc { font-size:14px; color:#8888aa; margin-top:4px; text-align:left; }
+  .btn-cancelar { background:#1e1e35; border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:20px; font-size:18px; color:#8888aa; margin-top:14px; }
 
-  .opcion-btn {
-    background: #1e1e35;
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 18px;
-    padding: 20px 18px;
-    display: flex; align-items: center; gap: 16px;
-    transition: background 0.15s;
-  }
-  .opcion-btn:active { background: #252542; }
-  .opcion-btn.peligro { border-color: rgba(229,62,62,0.35); background: rgba(229,62,62,0.1); }
-  .opcion-ico { font-size: 34px; flex-shrink: 0; }
-  .opcion-label { font-size: 18px; font-weight: 600; color: #f0f0ff; text-align: left; }
-  .opcion-desc { font-size: 14px; color: #8888aa; margin-top: 4px; text-align: left; }
-  .btn-cancelar {
-    background: #1e1e35;
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 16px;
-    padding: 20px;
-    font-size: 18px;
-    color: #8888aa;
-    margin-top: 14px;
-  }
-
-  /* ALERTA RECIBIDA */
-  .modal-alerta { text-align: center; justify-content: center; align-items: center; }
-  .anillo {
-    width: 120px; height: 120px;
-    border-radius: 50%;
-    background: rgba(229,62,62,0.12);
-    border: 3px solid #e53e3e;
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 24px;
-    font-size: 56px;
-    animation: anillo 1s infinite;
-  }
+  .modal-alerta { text-align:center; justify-content:center; align-items:center; }
+  .anillo { width:120px; height:120px; border-radius:50%; background:rgba(229,62,62,0.12); border:3px solid #e53e3e; display:flex; align-items:center; justify-content:center; margin:0 auto 24px; font-size:56px; animation:anillo 1s infinite; }
   @keyframes anillo { 0%,100%{box-shadow:0 0 0 0 rgba(229,62,62,0.5)} 50%{box-shadow:0 0 0 28px rgba(229,62,62,0)} }
-  .alerta-titulo-modal { color: #e53e3e; font-size: 28px; font-weight: 700; margin-bottom: 8px; }
-  .alerta-de { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
-  .alerta-direccion { font-size: 17px; color: #8888aa; margin-bottom: 20px; }
-  .alerta-mensaje {
-    background: #1e1e35;
-    border-radius: 16px;
-    padding: 18px;
-    margin-bottom: 24px;
-    width: 100%;
-  }
-  .alerta-mensaje p { font-size: 18px; color: #f0f0ff; line-height: 1.6; }
-  .modal-botones { display: flex; flex-direction: column; gap: 12px; width: 100%; }
-  .btn-llamar-911 {
-    background: #e53e3e; color: white;
-    border-radius: 16px; padding: 22px;
-    font-size: 22px; font-weight: 700;
-  }
-  .btn-ok {
-    background: #1e1e35;
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 16px; padding: 20px;
-    font-size: 18px; color: #8888aa;
-  }
+  .alerta-titulo-modal { color:#e53e3e; font-size:28px; font-weight:700; margin-bottom:8px; }
+  .alerta-de { font-size:22px; font-weight:600; margin-bottom:4px; }
+  .alerta-direccion { font-size:17px; color:#8888aa; margin-bottom:20px; }
+  .alerta-mensaje { background:#1e1e35; border-radius:16px; padding:18px; margin-bottom:24px; width:100%; }
+  .alerta-mensaje p { font-size:18px; color:#f0f0ff; line-height:1.6; }
+  .modal-botones { display:flex; flex-direction:column; gap:12px; width:100%; }
+  .btn-llamar-911 { background:#e53e3e; color:white; border-radius:16px; padding:22px; font-size:22px; font-weight:700; }
+  .btn-ok { background:#1e1e35; border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:20px; font-size:18px; color:#8888aa; }
 
-  /* CONFIRMACION ENVIADA */
-  .modal-enviada { text-align: center; justify-content: center; align-items: center; }
-  .check-ico { font-size: 80px; margin-bottom: 20px; animation: pop 0.4s ease; }
+  .modal-enviada { text-align:center; justify-content:center; align-items:center; }
+  .check-ico { font-size:80px; margin-bottom:20px; animation:pop 0.4s ease; }
   @keyframes pop { 0%{transform:scale(0.3)} 70%{transform:scale(1.1)} 100%{transform:scale(1)} }
-  .enviada-titulo { font-size: 28px; font-weight: 700; margin-bottom: 12px; }
-  .enviada-sub { font-size: 18px; color: #8888aa; line-height: 1.6; margin-bottom: 32px; }
-  .enviada-num { font-size: 52px; font-weight: 700; color: #e53e3e; }
-  .enviada-num-label { font-size: 16px; color: #8888aa; margin-top: 4px; }
-  .btn-cerrar {
-    background: #1e1e35; border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 16px; padding: 20px;
-    font-size: 18px; color: #8888aa;
-    margin-top: 32px; width: 100%;
-  }
+  .enviada-titulo { font-size:28px; font-weight:700; margin-bottom:12px; }
+  .enviada-sub { font-size:18px; color:#8888aa; line-height:1.6; margin-bottom:32px; }
+  .enviada-num { font-size:52px; font-weight:700; color:#e53e3e; }
+  .enviada-num-label { font-size:16px; color:#8888aa; margin-top:4px; }
+  .btn-cerrar { background:#1e1e35; border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:20px; font-size:18px; color:#8888aa; margin-top:32px; width:100%; }
+
+  /* MODAL AGREGAR VECINO */
+  .modal-form { justify-content:center; }
+  .form-fields { display:flex; flex-direction:column; gap:14px; margin-bottom:20px; }
+  .btn-guardar { width:100%; background:#e53e3e; color:white; border-radius:16px; padding:20px; font-size:20px; font-weight:700; }
+
+  /* LOADING */
+  .loading { color:#8888aa; font-size:16px; text-align:center; padding:20px; }
 </style>
 </head>
 <body>
@@ -305,7 +152,7 @@
   <!-- MODAL: TIPO DE ALERTA -->
   <div class="modal oculto" id="modalTipo">
     <div class="modal-titulo">¿Qué estás viendo?</div>
-    <div class="modal-sub">Tu alerta va a llegar a todos los vecinos de la cuadra ahora mismo</div>
+    <div class="modal-sub">Tu alerta va a llegar a todos los vecinos al instante</div>
     <div class="opciones">
       <button class="opcion-btn peligro" onclick="enviarAlerta('Persona desconocida rondando la cuadra')">
         <span class="opcion-ico">🕵️</span>
@@ -335,9 +182,9 @@
   <div class="modal modal-alerta oculto" id="modalAlerta">
     <div class="anillo">🚨</div>
     <div class="alerta-titulo-modal">¡ALERTA VECINAL!</div>
-    <div class="alerta-de" id="alertaDe">María González</div>
-    <div class="alerta-direccion" id="alertaDir">San Martín 847</div>
-    <div class="alerta-mensaje"><p id="alertaMsg">Persona desconocida rondando la cuadra.</p></div>
+    <div class="alerta-de" id="alertaDe"></div>
+    <div class="alerta-direccion" id="alertaDir"></div>
+    <div class="alerta-mensaje"><p id="alertaMsg"></p></div>
     <div class="modal-botones">
       <button class="btn-llamar-911" onclick="llamar('911')">📞 LLAMAR AL 911</button>
       <button class="btn-ok" onclick="cerrarModal('modalAlerta')">Entendido — estoy atento</button>
@@ -349,9 +196,31 @@
     <div class="check-ico">✅</div>
     <div class="enviada-titulo">¡Alerta enviada!</div>
     <div class="enviada-sub">Todos los vecinos de la cuadra fueron avisados al instante</div>
-    <div class="enviada-num" id="contadorVecinos">12</div>
+    <div class="enviada-num" id="contadorVecinos">0</div>
     <div class="enviada-num-label">vecinos notificados</div>
     <button class="btn-cerrar" onclick="cerrarModal('modalEnviada')">Cerrar</button>
+  </div>
+
+  <!-- MODAL: AGREGAR VECINO -->
+  <div class="modal modal-form oculto" id="modalAgregar">
+    <div class="modal-titulo">Agregar vecino</div>
+    <div class="modal-sub">El vecino va a aparecer en la app de toda la cuadra</div>
+    <div class="form-fields">
+      <div>
+        <label class="field-label">Nombre</label>
+        <input class="field-input" type="text" id="nuevoNombre" placeholder="Ej: Carlos">
+      </div>
+      <div>
+        <label class="field-label">Apellido</label>
+        <input class="field-input" type="text" id="nuevoApellido" placeholder="Ej: Pérez">
+      </div>
+      <div>
+        <label class="field-label">Dirección</label>
+        <input class="field-input" type="text" id="nuevaDireccion" placeholder="Ej: San Martín 823">
+      </div>
+    </div>
+    <button class="btn-guardar" onclick="guardarVecino()">Guardar vecino</button>
+    <button class="btn-cancelar" onclick="cerrarModal('modalAgregar')">Cancelar</button>
   </div>
 
   <!-- LOGIN -->
@@ -370,6 +239,7 @@
         <label class="field-label">Contraseña</label>
         <input class="field-input" type="password" placeholder="••••••••" id="inputPass">
       </div>
+      <div class="error-msg" id="errorMsg">Dirección o contraseña incorrecta</div>
       <button class="btn-ingresar" onclick="ingresar()">INGRESAR</button>
       <div class="login-nota">¿No tenés acceso? Pedíselo al administrador de tu cuadra</div>
     </div>
@@ -380,7 +250,7 @@
     <div class="top-bar">
       <div>
         <div class="bienvenida" id="nombreUsuario">Bienvenido</div>
-        <div class="direccion" id="dirUsuario">Cargando...</div>
+        <div class="direccion" id="dirUsuario"></div>
       </div>
       <div class="online-badge">
         <div class="dot-verde"></div>
@@ -389,8 +259,6 @@
     </div>
     <div class="scroll">
       <div class="home-content">
-
-        <!-- BOTON ALERTA -->
         <button class="btn-alerta" onclick="abrirTipo()">
           <div class="pulso"></div>
           <div class="alerta-inner">
@@ -399,180 +267,249 @@
             <span class="alerta-subtitulo">Tocá acá para avisar a todos los vecinos</span>
           </div>
         </button>
-
-        <!-- 911 -->
         <button class="btn-911" onclick="llamar('911')">
           <span class="btn-911-icono">👮</span>
-          <div class="btn-911-texto">
+          <div>
             <div class="btn-911-label">Llamar al 911</div>
             <div class="btn-911-sub">Policía — emergencia</div>
           </div>
         </button>
-
-        <!-- VECINOS -->
         <div class="seccion-titulo">Vecinos de la cuadra</div>
         <div class="vecinos-lista" id="listaVecinos">
-          <div style="color:#8888aa;font-size:16px;text-align:center;padding:20px">Cargando vecinos...</div>
+          <div class="loading">Cargando vecinos...</div>
         </div>
-
       </div>
     </div>
-    <div class="bottom-nav">
+    <div class="bottom-nav" id="navHome">
       <div class="nav-btn activo" onclick="irA('home')">
-        <span class="nav-ico">🏠</span>
-        <div class="nav-punto"></div>
-        <span class="nav-txt">Inicio</span>
+        <span class="nav-ico">🏠</span><div class="nav-punto"></div><span class="nav-txt">Inicio</span>
       </div>
-      <div class="nav-btn" onclick="irA('vecinos')">
-        <span class="nav-ico">👥</span>
-        <div class="nav-punto"></div>
-        <span class="nav-txt">Vecinos</span>
+      <div class="nav-btn" id="navAdminBtn" onclick="irA('admin')" style="display:none">
+        <span class="nav-ico">⚙️</span><div class="nav-punto"></div><span class="nav-txt">Admin</span>
       </div>
       <div class="nav-btn" onclick="doLogout()">
-        <span class="nav-ico">🚪</span>
-        <div class="nav-punto"></div>
-        <span class="nav-txt">Salir</span>
+        <span class="nav-ico">🚪</span><div class="nav-punto"></div><span class="nav-txt">Salir</span>
       </div>
     </div>
   </div>
 
-  <!-- VECINOS -->
-  <div class="page" id="page-vecinos">
+  <!-- ADMIN -->
+  <div class="page" id="page-admin">
     <div class="page-header">
-      <h1>Vecinos</h1>
-      <p id="subtituloVecinos">Cuadra</p>
+      <div>
+        <h1>Administrador</h1>
+        <p id="adminCuadra">Cuadra</p>
+      </div>
+      <span class="badge-admin">Admin</span>
     </div>
     <div class="scroll">
-      <div class="vecinos-scroll" id="listaVecinosCompleta"></div>
+      <div class="admin-content">
+        <button class="btn-agregar" onclick="abrirAgregar()">
+          ➕ Agregar vecino nuevo
+        </button>
+        <div id="listaAdmin">
+          <div class="loading">Cargando...</div>
+        </div>
+      </div>
     </div>
     <div class="bottom-nav">
       <div class="nav-btn" onclick="irA('home')">
-        <span class="nav-ico">🏠</span>
-        <div class="nav-punto"></div>
-        <span class="nav-txt">Inicio</span>
+        <span class="nav-ico">🏠</span><div class="nav-punto"></div><span class="nav-txt">Inicio</span>
       </div>
-      <div class="nav-btn activo" onclick="irA('vecinos')">
-        <span class="nav-ico">👥</span>
-        <div class="nav-punto"></div>
-        <span class="nav-txt">Vecinos</span>
+      <div class="nav-btn activo" onclick="irA('admin')">
+        <span class="nav-ico">⚙️</span><div class="nav-punto"></div><span class="nav-txt">Admin</span>
       </div>
       <div class="nav-btn" onclick="doLogout()">
-        <span class="nav-ico">🚪</span>
-        <div class="nav-punto"></div>
-        <span class="nav-txt">Salir</span>
+        <span class="nav-ico">🚪</span><div class="nav-punto"></div><span class="nav-txt">Salir</span>
       </div>
     </div>
   </div>
 
 </div>
 
-<script>
-// ===== GOOGLE SHEETS =====
-const SHEET_ID = '16M_CLopS1oJDWbzpsloA-iudXVjKDyDLVl7LZURoSnY';
-const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Sheet1`;
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAec7FF9qM5rCXYOwDTgd1CoAY7WvEyK9s",
+  authDomain: "barrio-seguro-f9271.firebaseapp.com",
+  projectId: "barrio-seguro-f9271",
+  storageBucket: "barrio-seguro-f9271.firebasestorage.app",
+  messagingSenderId: "863945266838",
+  appId: "1:863945266838:web:3ce88db7c3302b0ed914b7"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
+
+// ADMIN PASSWORD — cambiala cuando quieras
+const ADMIN_PASSWORD = 'admin123';
+const VECINO_PASSWORD = 'barrio2024';
 
 const COLORES = [
-  {bg:'#2d6a4f20',txt:'#68d391'},{bg:'#1a365d20',txt:'#90cdf4'},
-  {bg:'#44337a20',txt:'#d6bcfa'},{bg:'#7b341e20',txt:'#fbd38d'},
-  {bg:'#2c4a2e20',txt:'#9ae6b4'},{bg:'#5c2b2920',txt:'#fc8181'},
+  {bg:'rgba(45,106,79,0.2)',txt:'#68d391'},
+  {bg:'rgba(26,54,93,0.2)',txt:'#90cdf4'},
+  {bg:'rgba(68,51,122,0.2)',txt:'#d6bcfa'},
+  {bg:'rgba(123,52,30,0.2)',txt:'#fbd38d'},
+  {bg:'rgba(44,74,46,0.2)',txt:'#9ae6b4'},
+  {bg:'rgba(92,43,41,0.2)',txt:'#fc8181'},
 ];
 
-let VECINOS = [];
-
-async function cargarVecinos() {
-  try {
-    const res = await fetch(SHEET_URL);
-    const text = await res.text();
-    const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/)[1]);
-    const rows = json.table.rows;
-    VECINOS = rows.filter(r => r.c[0] && r.c[0].v).map((r, i) => {
-      const nombre = r.c[0] ? r.c[0].v : '';
-      const apellido = r.c[1] ? r.c[1].v : '';
-      const direccion = r.c[2] ? r.c[2].v : '';
-      const numero = r.c[3] ? r.c[3].v : '';
-      const activo = r.c[4] ? String(r.c[4].v).toUpperCase() : 'SI';
-      const col = COLORES[i % COLORES.length];
-      return {
-        nombre: nombre + ' ' + apellido,
-        dir: direccion + ' ' + numero,
-        iniciales: (nombre[0]||'') + (apellido[0]||''),
-        bg: col.bg, txt: col.txt,
-        online: activo === 'SI'
-      };
-    });
-    renderVecinos();
-    document.getElementById('contOnline').textContent = VECINOS.filter(v=>v.online).length + ' en línea';
-    document.getElementById('contadorVecinos').textContent = VECINOS.length;
-  } catch(e) {
-    document.getElementById('listaVecinos').innerHTML = '<div style="color:#8888aa;font-size:16px;text-align:center;padding:20px">Sin conexión — reintentando...</div>';
-    setTimeout(cargarVecinos, 5000);
-  }
-}
-
-function renderVecinos() {
-  const html = VECINOS.map(v => `
-    <div class="vecino-card">
-      <div class="vecino-avatar" style="background:${v.bg};color:${v.txt}">${v.iniciales.toUpperCase()}</div>
-      <div>
-        <div class="vecino-nombre">${v.nombre}</div>
-        <div class="vecino-dir">${v.dir}</div>
-      </div>
-      <div class="vecino-estado ${v.online?'online':'offline'}"></div>
-    </div>
-  `).join('');
-  document.getElementById('listaVecinos').innerHTML = html || '<div style="color:#8888aa;font-size:16px;text-align:center;padding:20px">No hay vecinos cargados</div>';
-  document.getElementById('listaVecinosCompleta').innerHTML = html;
-}
+let esAdmin = false;
+let vecinosCache = [];
 
 // ===== NAVEGACION =====
-function irA(pagina) {
+window.irA = function(pagina) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + pagina).classList.add('active');
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('activo'));
 }
 
 // ===== LOGIN =====
-function ingresar() {
+window.ingresar = function() {
   const dir = document.getElementById('inputDir').value.trim();
-  if (!dir) { alert('Ingresá tu dirección'); return; }
+  const pass = document.getElementById('inputPass').value.trim();
+  if (!dir) return;
+
+  if (pass === ADMIN_PASSWORD) {
+    esAdmin = true;
+  } else if (pass === VECINO_PASSWORD) {
+    esAdmin = false;
+  } else {
+    document.getElementById('errorMsg').style.display = 'block';
+    return;
+  }
+
+  document.getElementById('errorMsg').style.display = 'none';
   document.getElementById('nombreUsuario').textContent = dir;
   document.getElementById('dirUsuario').textContent = 'En línea';
+  document.getElementById('adminCuadra').textContent = dir;
+
+  if (esAdmin) {
+    document.getElementById('navAdminBtn').style.display = 'flex';
+  }
+
   irA('home');
-  cargarVecinos();
-  setTimeout(() => mostrarAlertaEntrante(), 5000);
+  escucharVecinos();
 }
 
-function doLogout() {
+window.doLogout = function() {
+  esAdmin = false;
+  document.getElementById('navAdminBtn').style.display = 'none';
+  document.getElementById('inputDir').value = '';
+  document.getElementById('inputPass').value = '';
   irA('login');
   document.getElementById('page-login').classList.add('active');
-  document.querySelectorAll('.page:not(#page-login)').forEach(p=>p.classList.remove('active'));
+}
+
+// ===== FIRESTORE: ESCUCHAR VECINOS EN TIEMPO REAL =====
+function escucharVecinos() {
+  const q = query(collection(db, 'vecinos'), orderBy('nombre'));
+  onSnapshot(q, (snapshot) => {
+    vecinosCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderVecinos();
+    renderAdmin();
+    document.getElementById('contOnline').textContent = vecinosCache.length + ' vecinos';
+    document.getElementById('contadorVecinos').textContent = vecinosCache.length;
+  });
+}
+
+// ===== RENDER VECINOS =====
+function renderVecinos() {
+  const lista = document.getElementById('listaVecinos');
+  if (vecinosCache.length === 0) {
+    lista.innerHTML = '<div class="loading">No hay vecinos cargados aún</div>';
+    return;
+  }
+  lista.innerHTML = vecinosCache.map((v, i) => {
+    const col = COLORES[i % COLORES.length];
+    const ini = ((v.nombre||'')[0]||'') + ((v.apellido||'')[0]||'');
+    return `
+      <div class="vecino-card">
+        <div class="vecino-avatar" style="background:${col.bg};color:${col.txt}">${ini.toUpperCase()}</div>
+        <div>
+          <div class="vecino-nombre">${v.nombre} ${v.apellido}</div>
+          <div class="vecino-dir">${v.direccion}</div>
+        </div>
+        <div class="vecino-estado st-online"></div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ===== RENDER ADMIN =====
+function renderAdmin() {
+  const lista = document.getElementById('listaAdmin');
+  if (vecinosCache.length === 0) {
+    lista.innerHTML = '<div class="loading">Todavía no hay vecinos — agregá el primero</div>';
+    return;
+  }
+  lista.innerHTML = vecinosCache.map((v, i) => {
+    const col = COLORES[i % COLORES.length];
+    const ini = ((v.nombre||'')[0]||'') + ((v.apellido||'')[0]||'');
+    return `
+      <div class="admin-vecino">
+        <div class="vecino-avatar" style="background:${col.bg};color:${col.txt};width:44px;height:44px;font-size:16px">${ini.toUpperCase()}</div>
+        <div class="admin-info">
+          <div class="admin-nombre">${v.nombre} ${v.apellido}</div>
+          <div class="admin-dir">${v.direccion}</div>
+        </div>
+        <button class="btn-eliminar" onclick="eliminarVecino('${v.id}', '${v.nombre}')">🗑️</button>
+      </div>
+    `;
+  }).join('');
+}
+
+// ===== AGREGAR VECINO =====
+window.abrirAgregar = function() {
+  document.getElementById('nuevoNombre').value = '';
+  document.getElementById('nuevoApellido').value = '';
+  document.getElementById('nuevaDireccion').value = '';
+  document.getElementById('modalAgregar').classList.remove('oculto');
+}
+
+window.guardarVecino = async function() {
+  const nombre = document.getElementById('nuevoNombre').value.trim();
+  const apellido = document.getElementById('nuevoApellido').value.trim();
+  const direccion = document.getElementById('nuevaDireccion').value.trim();
+  if (!nombre || !apellido || !direccion) {
+    alert('Completá todos los campos');
+    return;
+  }
+  try {
+    await addDoc(collection(db, 'vecinos'), { nombre, apellido, direccion, activo: true });
+    cerrarModal('modalAgregar');
+  } catch(e) {
+    alert('Error al guardar. Verificá tu conexión.');
+  }
+}
+
+// ===== ELIMINAR VECINO =====
+window.eliminarVecino = async function(id, nombre) {
+  if (!confirm(`¿Eliminar a ${nombre} de la cuadra?`)) return;
+  try {
+    await deleteDoc(doc(db, 'vecinos', id));
+  } catch(e) {
+    alert('Error al eliminar.');
+  }
 }
 
 // ===== ALERTA =====
-function abrirTipo() {
+window.abrirTipo = function() {
   document.getElementById('modalTipo').classList.remove('oculto');
 }
 
-function enviarAlerta(tipo) {
+window.enviarAlerta = function(tipo) {
   cerrarModal('modalTipo');
   document.getElementById('modalEnviada').classList.remove('oculto');
   sonarAlarma();
 }
 
-function mostrarAlertaEntrante() {
-  document.getElementById('alertaDe').textContent = 'María González';
-  document.getElementById('alertaDir').textContent = 'San Martín 847';
-  document.getElementById('alertaMsg').textContent = 'Persona desconocida rondando la cuadra hace 20 minutos.';
-  document.getElementById('modalAlerta').classList.remove('oculto');
-  sonarAlarma();
-}
-
-function cerrarModal(id) {
+window.cerrarModal = function(id) {
   document.getElementById(id).classList.add('oculto');
 }
 
-// ===== 911 =====
-function llamar(num) {
+window.llamar = function(num) {
   window.location.href = 'tel:' + num;
 }
 
