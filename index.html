@@ -206,6 +206,31 @@ button { cursor:pointer; border:none; background:none; font-family:inherit; }
 /* MODAL CREAR CUADRA SUPERADMIN */
 .msa-fields { display:flex; flex-direction:column; gap:14px; margin-bottom:16px; }
 </style>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "a623ac4a-62ee-4475-8cf9-c538b29f6e13",
+      safari_web_id: "web.onesignal.auto.40e188d7-5f7a-4af3-8ac5-05427adc97a7",
+      notifyButton: { enable: false },
+      promptOptions: {
+        slidedown: {
+          prompts: [{
+            type: "push",
+            autoPrompt: true,
+            text: {
+              actionMessage: "Recibí alertas de seguridad de tu cuadra al instante",
+              acceptButton: "Activar alertas",
+              cancelButton: "Ahora no"
+            },
+            delay: { pageViews: 1, timeDelay: 3 }
+          }]
+        }
+      }
+    });
+  });
+</script>
 </head>
 <body>
 <div id="app">
@@ -583,7 +608,14 @@ function arrancarApp() {
   if (sesion.esAdmin) document.getElementById('navAdminBtn').style.display = 'flex';
   irA('home');
   escucharVecinos();
-  pedirPermisosNotificacion();
+  // Registrar usuario en OneSignal con tag de cuadra
+  if (window.OneSignal) {
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    window.OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.User.addTag('cuadra', sesion.codigo);
+      await OneSignal.User.addTag('nombre', sesion.nombre);
+    });
+  }
 }
 
 // ===== ESCUCHAR VECINOS EN TIEMPO REAL =====
@@ -673,12 +705,34 @@ window.enviarAlerta = async function(tipo) {
   cerrar('mTipo');
   sonarAlarma();
   document.getElementById('mSent').classList.remove('hidden');
+  // Guardar alerta en Firestore
   if (sesion) {
-    await mandarNotificacionCuadra(
-      '🚨 Alerta de ' + sesion.nombre,
-      tipo + ' — ' + sesion.nombreCuadra,
-      sesion.codigo
-    );
+    try {
+      await addDoc(collection(db, 'cuadras', sesion.codigo, 'alertas'), {
+        tipo, nombre: sesion.nombre, fecha: new Date().toISOString()
+      });
+    } catch(e) { console.log('Error guardando alerta:', e); }
+  }
+  // Mandar notificacion via OneSignal API
+  if (sesion) {
+    try {
+      await fetch('https://onesignal.com/api/v1/notifications', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Basic os_v2_app_a623ac4a62ee44758cf9c538b29f6e13'
+        },
+        body: JSON.stringify({
+          app_id: 'a623ac4a-62ee-4475-8cf9-c538b29f6e13',
+          filters: [{ field: 'tag', key: 'cuadra', relation: '=', value: sesion.codigo }],
+          headings: { en: '🚨 Alerta de ' + sesion.nombre },
+          contents: { en: tipo + ' — ' + sesion.nombreCuadra },
+          url: 'https://merlojonatan1984.github.io/BARRIO-SEGURO/index.html',
+          android_accent_color: 'FFe53e3e',
+          priority: 10
+        })
+      });
+    } catch(e) { console.log('Error OneSignal:', e); }
   }
 }
 
