@@ -639,16 +639,55 @@
 </div><!-- end #app -->
 
 <script>
-// ===== DATOS DE EJEMPLO =====
-const VECINOS = [
-  { id:1, nombre:'María González', dir:'San Martín 847', iniciales:'MG', color:'#2d6a4f', colorText:'#68d391', online:true },
-  { id:2, nombre:'Jorge Rodríguez', dir:'San Martín 831', iniciales:'JR', color:'#1a365d', colorText:'#90cdf4', online:true },
-  { id:3, nombre:'Ana Pereyra', dir:'San Martín 855', iniciales:'AP', color:'#44337a', colorText:'#d6bcfa', online:true },
-  { id:4, nombre:'Luis Fernández', dir:'San Martín 819', iniciales:'LF', color:'#7b341e', colorText:'#fbd38d', online:false },
-  { id:5, nombre:'Claudia Méndez', dir:'San Martín 863', iniciales:'CM', color:'#2c4a2e', colorText:'#9ae6b4', online:true },
-  { id:6, nombre:'Pablo Torres', dir:'San Martín 811', iniciales:'PT', color:'#2a4365', colorText:'#bee3f8', online:false },
-  { id:7, nombre:'Susana López', dir:'San Martín 871', iniciales:'SL', color:'#5c2b29', colorText:'#fc8181', online:true },
+// ===== GOOGLE SHEETS CONFIG =====
+const SHEET_ID = '16M_CLopS1oJDWbzpsloA-iudXVjKDyDLVl7LZURoSnY';
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Sheet1`;
+
+const COLORES = [
+  { color:'#2d6a4f', colorText:'#68d391' },
+  { color:'#1a365d', colorText:'#90cdf4' },
+  { color:'#44337a', colorText:'#d6bcfa' },
+  { color:'#7b341e', colorText:'#fbd38d' },
+  { color:'#2c4a2e', colorText:'#9ae6b4' },
+  { color:'#2a4365', colorText:'#bee3f8' },
+  { color:'#5c2b29', colorText:'#fc8181' },
 ];
+
+let VECINOS = [];
+
+async function cargarVecinos() {
+  try {
+    const res = await fetch(SHEET_URL);
+    const text = await res.text();
+    const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/)[1]);
+    const rows = json.table.rows;
+    VECINOS = rows
+      .filter(r => r.c[0] && r.c[0].v)
+      .map((r, i) => {
+        const nombre = r.c[0] ? r.c[0].v : '';
+        const apellido = r.c[1] ? r.c[1].v : '';
+        const direccion = r.c[2] ? r.c[2].v : '';
+        const numero = r.c[3] ? r.c[3].v : '';
+        const activo = r.c[4] ? r.c[4].v : 'SI';
+        const iniciales = (nombre[0] || '') + (apellido[0] || '');
+        const col = COLORES[i % COLORES.length];
+        return {
+          id: i + 1,
+          nombre: nombre + ' ' + apellido,
+          dir: direccion + ' ' + numero,
+          iniciales: iniciales.toUpperCase(),
+          color: col.color,
+          colorText: col.colorText,
+          online: activo === 'SI' || activo === 'si' || activo === true,
+        };
+      });
+    renderVecinos();
+    renderAdminVecinos();
+    document.getElementById('onlineCount').textContent = VECINOS.filter(v => v.online).length + ' en línea';
+  } catch(e) {
+    console.log('Error cargando vecinos:', e);
+  }
+}
 
 const HISTORIAL = [
   { tipo:'Persona sospechosa', icono:'🕵️', vecino:'María González', dir:'San Martín 847', tiempo:'Hace 2 horas', estado:'Resuelta', color:'roja' },
@@ -678,9 +717,8 @@ function doLogin() {
   document.getElementById('page-login').classList.remove('active');
   document.getElementById('page-home').classList.add('active');
   updateTime();
-  renderVecinos();
+  cargarVecinos();
   renderHistorial();
-  renderAdminVecinos();
   // Simular alerta entrante después de 4 segundos
   setTimeout(() => showIncomingAlert(), 4000);
 }
@@ -827,4 +865,3 @@ function toggleSwitch(id) {
 </script>
 </body>
 </html>
-
