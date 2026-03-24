@@ -9,327 +9,407 @@
 <title>Barrio Seguro</title>
 <link rel="manifest" href="manifest.json">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  html, body { height: 100%; font-family: -apple-system, 'Segoe UI', sans-serif; background: #0f0f1a; color: #f0f0ff; overflow: hidden; }
-  button { cursor: pointer; border: none; background: none; font-family: inherit; }
+* { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+html,body { height:100%; font-family:-apple-system,'Segoe UI',sans-serif; background:#0f0f1a; color:#f0f0ff; overflow:hidden; }
+button { cursor:pointer; border:none; background:none; font-family:inherit; }
+#app { height:100vh; display:flex; flex-direction:column; max-width:480px; margin:0 auto; }
+.page { display:none; flex-direction:column; flex:1; overflow:hidden; animation:fadeIn 0.2s ease; }
+.page.active { display:flex; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+.scroll { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.scroll::-webkit-scrollbar { display:none; }
 
-  #app { height: 100vh; display: flex; flex-direction: column; max-width: 480px; margin: 0 auto; }
+/* COLORES */
+:root {
+  --red:#e53e3e; --red2:rgba(229,62,62,0.15); --red3:rgba(229,62,62,0.35);
+  --bg:#0f0f1a; --bg2:#16162a; --bg3:#1e1e35; --bg4:#252542;
+  --text:#f0f0ff; --muted:#8888aa; --border:rgba(255,255,255,0.08);
+  --green:#38a169; --green2:rgba(56,161,105,0.15); --green3:rgba(56,161,105,0.3);
+}
 
-  .page { display: none; flex-direction: column; flex: 1; overflow: hidden; animation: fadeIn 0.2s ease; }
-  .page.active { display: flex; }
-  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+/* INPUTS */
+.field-label { font-size:16px; color:var(--muted); display:block; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px; }
+.field-input { width:100%; background:var(--bg3); border:1px solid var(--border); border-radius:14px; padding:18px 20px; color:var(--text); font-size:20px; outline:none; transition:border-color 0.2s; }
+.field-input:focus { border-color:var(--red); }
+.field-input::placeholder { color:#444466; }
 
-  .scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-  .scroll::-webkit-scrollbar { display: none; }
+/* BOTONES */
+.btn-red { width:100%; background:var(--red); color:white; border-radius:16px; padding:20px; font-size:20px; font-weight:700; transition:transform 0.1s; }
+.btn-red:active { transform:scale(0.97); }
+.btn-gray { width:100%; background:var(--bg3); border:1px solid var(--border); border-radius:16px; padding:18px; font-size:17px; color:var(--muted); }
+.btn-gray:active { background:var(--bg4); }
+.error-msg { color:#fc8181; font-size:15px; text-align:center; padding:8px; display:none; }
 
-  /* LOGIN */
-  #page-login { background:#0f0f1a; justify-content:center; align-items:center; padding:2rem; gap:2rem; }
-  .login-logo { text-align:center; }
-  .shield-icon { width:100px; height:100px; background:#e53e3e; border-radius:28px; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:56px; }
-  .login-logo h1 { font-size:30px; font-weight:700; letter-spacing:2px; }
-  .login-logo p { font-size:18px; color:#8888aa; margin-top:8px; }
-  .login-form { width:100%; display:flex; flex-direction:column; gap:16px; }
-  .field-label { font-size:16px; color:#8888aa; display:block; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px; }
-  .field-input { width:100%; background:#1e1e35; border:1px solid rgba(255,255,255,0.12); border-radius:14px; padding:18px 20px; color:#f0f0ff; font-size:20px; outline:none; }
-  .field-input:focus { border-color:#e53e3e; }
-  .field-input::placeholder { color:#555577; }
-  .btn-ingresar { width:100%; background:#e53e3e; color:white; border-radius:16px; padding:22px; font-size:22px; font-weight:700; margin-top:8px; transition:transform 0.1s; }
-  .btn-ingresar:active { transform:scale(0.97); }
-  .login-nota { text-align:center; font-size:15px; color:#555577; line-height:1.6; }
-  .error-msg { color:#fc8181; font-size:15px; text-align:center; display:none; }
+/* TOP BAR */
+.top-bar { background:var(--bg2); padding:16px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+.top-nombre { font-size:19px; font-weight:600; }
+.top-dir { font-size:14px; color:var(--muted); margin-top:2px; }
+.online-pill { background:var(--green2); border:1px solid var(--green3); color:#68d391; font-size:13px; padding:7px 13px; border-radius:20px; display:flex; align-items:center; gap:6px; flex-shrink:0; }
+.dot { width:7px; height:7px; border-radius:50%; background:var(--green); animation:blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-  /* TOP BAR */
-  .top-bar { background:#16162a; padding:18px 20px; border-bottom:1px solid rgba(255,255,255,0.07); display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
-  .top-bar .bienvenida { font-size:20px; font-weight:600; }
-  .top-bar .direccion { font-size:15px; color:#8888aa; margin-top:3px; }
-  .online-badge { background:rgba(56,161,105,0.15); border:1px solid rgba(56,161,105,0.3); color:#68d391; font-size:14px; padding:8px 14px; border-radius:20px; display:flex; align-items:center; gap:6px; flex-shrink:0; }
-  .dot-verde { width:8px; height:8px; border-radius:50%; background:#38a169; animation:blink 2s infinite; }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+/* PAGE HEADER */
+.ph { background:var(--bg2); padding:18px 20px; border-bottom:1px solid var(--border); flex-shrink:0; display:flex; align-items:center; justify-content:space-between; }
+.ph h1 { font-size:24px; font-weight:700; }
+.ph p { font-size:14px; color:var(--muted); margin-top:3px; }
+.badge { font-size:12px; padding:6px 12px; border-radius:20px; }
+.badge-blue { background:rgba(49,130,206,0.15); border:1px solid rgba(49,130,206,0.3); color:#90cdf4; }
+.badge-green { background:var(--green2); border:1px solid var(--green3); color:#68d391; }
+.badge-red { background:var(--red2); border:1px solid var(--red3); color:#fc8181; }
 
-  /* HOME */
-  #page-home { background:#0f0f1a; }
-  .home-content { padding:20px; display:flex; flex-direction:column; gap:20px; }
+/* BOTTOM NAV */
+.bnav { background:var(--bg2); border-top:1px solid var(--border); padding:8px 0 18px; display:flex; flex-shrink:0; }
+.nb { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px; }
+.nb .ni { font-size:26px; line-height:1; }
+.nb .nt { font-size:12px; color:var(--muted); }
+.nb .np { width:4px; height:4px; border-radius:50%; background:var(--red); margin:0 auto; opacity:0; }
+.nb.on .nt { color:var(--red); }
+.nb.on .np { opacity:1; }
 
-  .btn-alerta { width:100%; background:#e53e3e; border-radius:24px; padding:36px 20px; position:relative; overflow:hidden; transition:transform 0.1s; }
-  .btn-alerta:active { transform:scale(0.97); }
-  .pulso { position:absolute; inset:0; border-radius:24px; background:rgba(255,255,255,0.06); animation:pulso 2.5s infinite; }
-  @keyframes pulso { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0;transform:scale(1.03)} }
-  .alerta-inner { position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; gap:12px; }
-  .alerta-icono { font-size:64px; }
-  .alerta-titulo { color:white; font-size:26px; font-weight:700; }
-  .alerta-subtitulo { color:rgba(255,255,255,0.8); font-size:17px; text-align:center; line-height:1.4; }
+/* VECINO CARD */
+.vcards { display:flex; flex-direction:column; gap:10px; }
+.vcard { background:var(--bg3); border:1px solid var(--border); border-radius:16px; padding:14px 16px; display:flex; align-items:center; gap:13px; }
+.vavatar { width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:700; flex-shrink:0; }
+.vnombre { font-size:17px; font-weight:600; }
+.vdir { font-size:14px; color:var(--muted); margin-top:2px; }
+.vdot { width:10px; height:10px; border-radius:50%; flex-shrink:0; margin-left:auto; }
+.von { background:var(--green); }
+.voff { background:#444466; }
 
-  .btn-911 { width:100%; background:#16162a; border:2px solid rgba(229,62,62,0.4); border-radius:20px; padding:24px 20px; display:flex; align-items:center; justify-content:center; gap:16px; }
-  .btn-911:active { background:#1e1e35; }
-  .btn-911-icono { font-size:36px; }
-  .btn-911-label { font-size:22px; font-weight:700; color:#f0f0ff; }
-  .btn-911-sub { font-size:15px; color:#8888aa; margin-top:3px; }
+/* LOADING */
+.cargando { color:var(--muted); font-size:16px; text-align:center; padding:24px; }
 
-  .seccion-titulo { font-size:18px; color:#8888aa; text-transform:uppercase; letter-spacing:0.8px; }
-  .vecinos-lista { display:flex; flex-direction:column; gap:10px; }
-  .vecino-card { background:#1e1e35; border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:16px 18px; display:flex; align-items:center; gap:14px; }
-  .vecino-avatar { width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; flex-shrink:0; }
-  .vecino-nombre { font-size:18px; font-weight:600; color:#f0f0ff; }
-  .vecino-dir { font-size:15px; color:#8888aa; margin-top:3px; }
-  .vecino-estado { width:12px; height:12px; border-radius:50%; flex-shrink:0; margin-left:auto; }
-  .st-online { background:#38a169; }
-  .st-offline { background:#444466; }
+/* MODALES */
+.modal { position:fixed; inset:0; background:rgba(5,5,15,0.96); z-index:200; display:flex; flex-direction:column; padding:1.5rem; animation:su 0.25s ease; }
+.modal.hidden { display:none; }
+@keyframes su { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+.mt { font-size:24px; font-weight:700; margin-bottom:6px; }
+.ms { font-size:16px; color:var(--muted); margin-bottom:20px; line-height:1.5; }
 
-  /* PAGE HEADER */
-  .page-header { background:#16162a; padding:20px; border-bottom:1px solid rgba(255,255,255,0.07); flex-shrink:0; display:flex; align-items:center; justify-content:space-between; }
-  .page-header h1 { font-size:26px; font-weight:700; }
-  .page-header p { font-size:16px; color:#8888aa; margin-top:4px; }
+/* MODAL TIPO ALERTA */
+.opciones { display:flex; flex-direction:column; gap:10px; flex:1; overflow-y:auto; }
+.opcion { background:var(--bg3); border:1px solid var(--border); border-radius:16px; padding:18px 16px; display:flex; align-items:center; gap:14px; }
+.opcion:active { background:var(--bg4); }
+.opcion.danger { border-color:var(--red3); background:var(--red2); }
+.oi { font-size:32px; flex-shrink:0; }
+.ol { font-size:17px; font-weight:600; text-align:left; }
+.od { font-size:13px; color:var(--muted); margin-top:3px; text-align:left; }
 
-  /* ADMIN PAGE */
-  #page-admin { background:#0f0f1a; }
-  .admin-content { padding:16px; display:flex; flex-direction:column; gap:12px; }
-  .admin-vecino { background:#1e1e35; border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:14px 16px; display:flex; align-items:center; gap:12px; }
-  .admin-info { flex:1; }
-  .admin-nombre { font-size:17px; font-weight:600; }
-  .admin-dir { font-size:14px; color:#8888aa; margin-top:2px; }
-  .btn-eliminar { background:rgba(229,62,62,0.12); border:1px solid rgba(229,62,62,0.3); border-radius:10px; width:40px; height:40px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
-  .btn-agregar { width:100%; background:#e53e3e; color:white; border-radius:16px; padding:20px; font-size:20px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:10px; }
-  .badge-admin { background:rgba(49,130,206,0.15); border:1px solid rgba(49,130,206,0.3); color:#90cdf4; font-size:13px; padding:6px 12px; border-radius:20px; }
+/* MODAL ALERTA RECIBIDA */
+.modal-recv { text-align:center; justify-content:center; align-items:center; }
+.anillo { width:110px; height:110px; border-radius:50%; background:var(--red2); border:3px solid var(--red); display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:52px; animation:ring 1s infinite; }
+@keyframes ring { 0%,100%{box-shadow:0 0 0 0 rgba(229,62,62,0.5)} 50%{box-shadow:0 0 0 26px rgba(229,62,62,0)} }
+.recv-titulo { color:var(--red); font-size:26px; font-weight:700; margin-bottom:6px; }
+.recv-de { font-size:20px; font-weight:600; margin-bottom:3px; }
+.recv-dir { font-size:16px; color:var(--muted); margin-bottom:18px; }
+.recv-msg { background:var(--bg3); border-radius:14px; padding:16px; margin-bottom:20px; width:100%; }
+.recv-msg p { font-size:17px; line-height:1.6; }
+.mbotones { display:flex; flex-direction:column; gap:10px; width:100%; }
+.btn-911m { background:var(--red); color:white; border-radius:14px; padding:20px; font-size:20px; font-weight:700; }
+.btn-okm { background:var(--bg3); border:1px solid var(--border); border-radius:14px; padding:18px; font-size:17px; color:var(--muted); }
 
-  /* BOTTOM NAV */
-  .bottom-nav { background:#16162a; border-top:1px solid rgba(255,255,255,0.07); padding:10px 0 20px; display:flex; flex-shrink:0; }
-  .nav-btn { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; padding:8px; }
-  .nav-btn .nav-ico { font-size:28px; }
-  .nav-btn .nav-txt { font-size:13px; color:#8888aa; }
-  .nav-btn.activo .nav-txt { color:#e53e3e; }
-  .nav-btn .nav-punto { width:5px; height:5px; border-radius:50%; background:#e53e3e; margin:0 auto; opacity:0; }
-  .nav-btn.activo .nav-punto { opacity:1; }
+/* MODAL ENVIADA */
+.modal-sent { text-align:center; justify-content:center; align-items:center; }
+.sent-ico { font-size:72px; margin-bottom:18px; animation:pop 0.4s ease; }
+@keyframes pop { 0%{transform:scale(0.3)} 70%{transform:scale(1.1)} 100%{transform:scale(1)} }
+.sent-t { font-size:26px; font-weight:700; margin-bottom:10px; }
+.sent-s { font-size:17px; color:var(--muted); line-height:1.6; margin-bottom:28px; }
+.sent-n { font-size:48px; font-weight:700; color:var(--red); }
+.sent-nl { font-size:15px; color:var(--muted); margin-top:4px; }
 
-  /* MODALES */
-  .modal { position:fixed; inset:0; background:rgba(5,5,15,0.96); z-index:100; display:flex; flex-direction:column; padding:2rem; animation:slideUp 0.25s ease; }
-  .modal.oculto { display:none; }
-  @keyframes slideUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+/* PANTALLAS ESPECIFICAS */
+#page-bienvenida { background:var(--bg); justify-content:center; align-items:center; padding:2rem; gap:1.5rem; }
+.logo-wrap { text-align:center; }
+.logo-img { width:96px; height:96px; border-radius:26px; object-fit:cover; margin:0 auto 16px; display:block; }
+.logo-fallback { width:96px; height:96px; border-radius:26px; background:var(--red); display:flex; align-items:center; justify-content:center; font-size:52px; margin:0 auto 16px; }
+.logo-wrap h1 { font-size:28px; font-weight:700; letter-spacing:2px; }
+.logo-wrap p { font-size:17px; color:var(--muted); margin-top:6px; }
+.bienvenida-btns { width:100%; display:flex; flex-direction:column; gap:12px; }
 
-  .modal-titulo { font-size:26px; font-weight:700; margin-bottom:8px; }
-  .modal-sub { font-size:17px; color:#8888aa; margin-bottom:24px; line-height:1.5; }
-  .opciones { display:flex; flex-direction:column; gap:12px; flex:1; }
-  .opcion-btn { background:#1e1e35; border:1px solid rgba(255,255,255,0.1); border-radius:18px; padding:20px 18px; display:flex; align-items:center; gap:16px; }
-  .opcion-btn:active { background:#252542; }
-  .opcion-btn.peligro { border-color:rgba(229,62,62,0.35); background:rgba(229,62,62,0.1); }
-  .opcion-ico { font-size:34px; flex-shrink:0; }
-  .opcion-label { font-size:18px; font-weight:600; color:#f0f0ff; text-align:left; }
-  .opcion-desc { font-size:14px; color:#8888aa; margin-top:4px; text-align:left; }
-  .btn-cancelar { background:#1e1e35; border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:20px; font-size:18px; color:#8888aa; margin-top:14px; }
+#page-login { background:var(--bg); justify-content:center; padding:2rem; }
+.login-back { color:var(--muted); font-size:16px; margin-bottom:20px; display:flex; align-items:center; gap:6px; }
+.login-form { display:flex; flex-direction:column; gap:16px; }
+.login-titulo { font-size:22px; font-weight:700; margin-bottom:4px; }
+.login-sub { font-size:15px; color:var(--muted); margin-bottom:8px; }
 
-  .modal-alerta { text-align:center; justify-content:center; align-items:center; }
-  .anillo { width:120px; height:120px; border-radius:50%; background:rgba(229,62,62,0.12); border:3px solid #e53e3e; display:flex; align-items:center; justify-content:center; margin:0 auto 24px; font-size:56px; animation:anillo 1s infinite; }
-  @keyframes anillo { 0%,100%{box-shadow:0 0 0 0 rgba(229,62,62,0.5)} 50%{box-shadow:0 0 0 28px rgba(229,62,62,0)} }
-  .alerta-titulo-modal { color:#e53e3e; font-size:28px; font-weight:700; margin-bottom:8px; }
-  .alerta-de { font-size:22px; font-weight:600; margin-bottom:4px; }
-  .alerta-direccion { font-size:17px; color:#8888aa; margin-bottom:20px; }
-  .alerta-mensaje { background:#1e1e35; border-radius:16px; padding:18px; margin-bottom:24px; width:100%; }
-  .alerta-mensaje p { font-size:18px; color:#f0f0ff; line-height:1.6; }
-  .modal-botones { display:flex; flex-direction:column; gap:12px; width:100%; }
-  .btn-llamar-911 { background:#e53e3e; color:white; border-radius:16px; padding:22px; font-size:22px; font-weight:700; }
-  .btn-ok { background:#1e1e35; border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:20px; font-size:18px; color:#8888aa; }
+#page-registro { background:var(--bg); justify-content:center; padding:2rem; }
+.reg-form { display:flex; flex-direction:column; gap:16px; }
 
-  .modal-enviada { text-align:center; justify-content:center; align-items:center; }
-  .check-ico { font-size:80px; margin-bottom:20px; animation:pop 0.4s ease; }
-  @keyframes pop { 0%{transform:scale(0.3)} 70%{transform:scale(1.1)} 100%{transform:scale(1)} }
-  .enviada-titulo { font-size:28px; font-weight:700; margin-bottom:12px; }
-  .enviada-sub { font-size:18px; color:#8888aa; line-height:1.6; margin-bottom:32px; }
-  .enviada-num { font-size:52px; font-weight:700; color:#e53e3e; }
-  .enviada-num-label { font-size:16px; color:#8888aa; margin-top:4px; }
-  .btn-cerrar { background:#1e1e35; border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:20px; font-size:18px; color:#8888aa; margin-top:32px; width:100%; }
+#page-crear { background:var(--bg); justify-content:center; padding:2rem; }
+.crear-form { display:flex; flex-direction:column; gap:16px; }
 
-  /* MODAL AGREGAR VECINO */
-  .modal-form { justify-content:center; }
-  .form-fields { display:flex; flex-direction:column; gap:14px; margin-bottom:20px; }
-  .btn-guardar { width:100%; background:#e53e3e; color:white; border-radius:16px; padding:20px; font-size:20px; font-weight:700; }
+#page-home { background:var(--bg); }
+.home-content { padding:18px; display:flex; flex-direction:column; gap:18px; }
+.btn-alerta { width:100%; background:var(--red); border-radius:22px; padding:32px 20px; position:relative; overflow:hidden; transition:transform 0.1s; }
+.btn-alerta:active { transform:scale(0.97); }
+.pulso { position:absolute; inset:0; border-radius:22px; background:rgba(255,255,255,0.06); animation:pulso 2.5s infinite; }
+@keyframes pulso { 0%,100%{opacity:1} 50%{opacity:0} }
+.ai { position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; gap:10px; }
+.ai-ico { font-size:56px; }
+.ai-t { color:white; font-size:24px; font-weight:700; }
+.ai-s { color:rgba(255,255,255,0.8); font-size:16px; text-align:center; }
+.btn-911w { width:100%; background:var(--bg2); border:2px solid var(--red3); border-radius:18px; padding:22px 20px; display:flex; align-items:center; justify-content:center; gap:14px; }
+.btn-911w:active { background:var(--bg3); }
+.b9i { font-size:32px; }
+.b9t { font-size:20px; font-weight:700; }
+.b9s { font-size:14px; color:var(--muted); margin-top:2px; }
+.sec-label { font-size:16px; color:var(--muted); text-transform:uppercase; letter-spacing:0.8px; }
 
-  /* LOADING */
-  .loading { color:#8888aa; font-size:16px; text-align:center; padding:20px; }
+#page-admin { background:var(--bg); }
+.admin-content { padding:16px; display:flex; flex-direction:column; gap:10px; }
+.codigo-box { background:var(--bg3); border:1px solid var(--border); border-radius:16px; padding:16px; text-align:center; }
+.codigo-label { font-size:13px; color:var(--muted); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:8px; }
+.codigo-val { font-size:32px; font-weight:700; color:var(--red); letter-spacing:4px; }
+.codigo-hint { font-size:13px; color:var(--muted); margin-top:8px; line-height:1.5; }
+.btn-compartir { width:100%; background:var(--bg3); border:1px solid var(--border); border-radius:14px; padding:16px; font-size:17px; color:var(--text); display:flex; align-items:center; justify-content:center; gap:8px; }
+.admin-vec { background:var(--bg3); border:1px solid var(--border); border-radius:14px; padding:12px 14px; display:flex; align-items:center; gap:10px; }
+.av-info { flex:1; }
+.av-nombre { font-size:16px; font-weight:600; }
+.av-dir { font-size:13px; color:var(--muted); margin-top:2px; }
+.btn-del { background:var(--red2); border:1px solid var(--red3); border-radius:10px; width:38px; height:38px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+.btn-add { width:100%; background:var(--red); color:white; border-radius:14px; padding:18px; font-size:18px; font-weight:700; display:flex; align-items:center; justify-content:center; gap:8px; }
+
+/* MODAL AGREGAR */
+.madd-fields { display:flex; flex-direction:column; gap:14px; margin-bottom:16px; }
+
+/* SUPERADMIN */
+#page-superadmin { background:var(--bg); }
+.sa-content { padding:16px; display:flex; flex-direction:column; gap:12px; }
+.sa-stats { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.sa-stat { background:var(--bg3); border:1px solid var(--border); border-radius:14px; padding:14px; text-align:center; }
+.sa-stat-n { font-size:30px; font-weight:700; color:var(--text); display:block; }
+.sa-stat-l { font-size:12px; color:var(--muted); display:block; margin-top:3px; text-transform:uppercase; letter-spacing:0.5px; }
+.cuadra-card { background:var(--bg3); border:1px solid var(--border); border-radius:14px; padding:14px 16px; }
+.cc-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.cc-nombre { font-size:17px; font-weight:600; }
+.cc-codigo { font-size:18px; font-weight:700; color:var(--red); letter-spacing:3px; }
+.cc-info { font-size:13px; color:var(--muted); margin-bottom:10px; }
+.cc-btns { display:flex; gap:8px; }
+.btn-wa { flex:1; background:rgba(37,211,102,0.15); border:1px solid rgba(37,211,102,0.3); color:#25d366; border-radius:10px; padding:10px; font-size:14px; font-weight:600; }
+.btn-del-c { background:var(--red2); border:1px solid var(--red3); color:#fc8181; border-radius:10px; padding:10px 14px; font-size:14px; }
+.badge-paga { background:rgba(56,161,105,0.15); border:1px solid rgba(56,161,105,0.3); color:#68d391; font-size:11px; padding:4px 10px; border-radius:20px; }
+.badge-impaga { background:rgba(212,160,23,0.15); border:1px solid rgba(212,160,23,0.3); color:#f6e05e; font-size:11px; padding:4px 10px; border-radius:20px; }
+
+/* MODAL CREAR CUADRA SUPERADMIN */
+.msa-fields { display:flex; flex-direction:column; gap:14px; margin-bottom:16px; }
 </style>
 </head>
 <body>
 <div id="app">
 
-  <!-- MODAL: TIPO DE ALERTA -->
-  <div class="modal oculto" id="modalTipo">
-    <div class="modal-titulo">¿Qué estás viendo?</div>
-    <div class="modal-sub">Tu alerta va a llegar a todos los vecinos al instante</div>
-    <div class="opciones">
-      <button class="opcion-btn peligro" onclick="enviarAlerta('Persona desconocida rondando la cuadra')">
-        <span class="opcion-ico">🕵️</span>
-        <div><div class="opcion-label">Persona sospechosa</div><div class="opcion-desc">Alguien desconocido rondando</div></div>
-      </button>
-      <button class="opcion-btn peligro" onclick="enviarAlerta('Robo o intento de robo en la cuadra')">
-        <span class="opcion-ico">🚨</span>
-        <div><div class="opcion-label">Robo / intento de robo</div><div class="opcion-desc">Situación de robo activa</div></div>
-      </button>
-      <button class="opcion-btn" onclick="enviarAlerta('Vehículo sospechoso estacionado')">
-        <span class="opcion-ico">🚗</span>
-        <div><div class="opcion-label">Auto sospechoso</div><div class="opcion-desc">Vehículo raro o merodeando</div></div>
-      </button>
-      <button class="opcion-btn" onclick="enviarAlerta('Situación inusual en la cuadra')">
-        <span class="opcion-ico">👁️</span>
-        <div><div class="opcion-label">Algo llamativo</div><div class="opcion-desc">Situación que llama la atención</div></div>
-      </button>
-      <button class="opcion-btn" onclick="enviarAlerta('Necesito ayuda urgente en mi domicilio')">
-        <span class="opcion-ico">🏠</span>
-        <div><div class="opcion-label">Necesito ayuda</div><div class="opcion-desc">Emergencia en mi casa</div></div>
-      </button>
-    </div>
-    <button class="btn-cancelar" onclick="cerrarModal('modalTipo')">Cancelar</button>
+<!-- MODAL TIPO ALERTA -->
+<div class="modal hidden" id="mTipo">
+  <div class="mt">¿Qué estás viendo?</div>
+  <div class="ms">Tu alerta llega a todos los vecinos al instante</div>
+  <div class="opciones">
+    <button class="opcion danger" onclick="enviarAlerta('Persona desconocida rondando la cuadra')">
+      <span class="oi">🕵️</span><div><div class="ol">Persona sospechosa</div><div class="od">Alguien desconocido rondando</div></div>
+    </button>
+    <button class="opcion danger" onclick="enviarAlerta('Robo o intento de robo en la cuadra')">
+      <span class="oi">🚨</span><div><div class="ol">Robo / intento de robo</div><div class="od">Situación de robo activa</div></div>
+    </button>
+    <button class="opcion" onclick="enviarAlerta('Vehículo sospechoso estacionado')">
+      <span class="oi">🚗</span><div><div class="ol">Auto sospechoso</div><div class="od">Vehículo raro o merodeando</div></div>
+    </button>
+    <button class="opcion" onclick="enviarAlerta('Situación inusual en la cuadra')">
+      <span class="oi">👁️</span><div><div class="ol">Algo llamativo</div><div class="od">Situación que llama la atención</div></div>
+    </button>
+    <button class="opcion" onclick="enviarAlerta('Necesito ayuda urgente en mi domicilio')">
+      <span class="oi">🏠</span><div><div class="ol">Necesito ayuda</div><div class="od">Emergencia en mi casa</div></div>
+    </button>
   </div>
+  <button class="btn-gray" style="margin-top:14px" onclick="cerrar('mTipo')">Cancelar</button>
+</div>
 
-  <!-- MODAL: ALERTA RECIBIDA -->
-  <div class="modal modal-alerta oculto" id="modalAlerta">
-    <div class="anillo">🚨</div>
-    <div class="alerta-titulo-modal">¡ALERTA VECINAL!</div>
-    <div class="alerta-de" id="alertaDe"></div>
-    <div class="alerta-direccion" id="alertaDir"></div>
-    <div class="alerta-mensaje"><p id="alertaMsg"></p></div>
-    <div class="modal-botones">
-      <button class="btn-llamar-911" onclick="llamar('911')">📞 LLAMAR AL 911</button>
-      <button class="btn-ok" onclick="cerrarModal('modalAlerta')">Entendido — estoy atento</button>
-    </div>
+<!-- MODAL ALERTA RECIBIDA -->
+<div class="modal modal-recv hidden" id="mRecv">
+  <div class="anillo">🚨</div>
+  <div class="recv-titulo">¡ALERTA VECINAL!</div>
+  <div class="recv-de" id="rDe"></div>
+  <div class="recv-dir" id="rDir"></div>
+  <div class="recv-msg"><p id="rMsg"></p></div>
+  <div class="mbotones">
+    <button class="btn-911m" onclick="llamar911()">📞 LLAMAR AL 911</button>
+    <button class="btn-okm" onclick="cerrar('mRecv')">Entendido — estoy atento</button>
   </div>
+</div>
 
-  <!-- MODAL: ALERTA ENVIADA -->
-  <div class="modal modal-enviada oculto" id="modalEnviada">
-    <div class="check-ico">✅</div>
-    <div class="enviada-titulo">¡Alerta enviada!</div>
-    <div class="enviada-sub">Todos los vecinos de la cuadra fueron avisados al instante</div>
-    <div class="enviada-num" id="contadorVecinos">0</div>
-    <div class="enviada-num-label">vecinos notificados</div>
-    <button class="btn-cerrar" onclick="cerrarModal('modalEnviada')">Cerrar</button>
+<!-- MODAL ENVIADA -->
+<div class="modal modal-sent hidden" id="mSent">
+  <div class="sent-ico">✅</div>
+  <div class="sent-t">¡Alerta enviada!</div>
+  <div class="sent-s">Todos los vecinos de la cuadra fueron avisados al instante</div>
+  <div class="sent-n" id="sentN">0</div>
+  <div class="sent-nl">vecinos notificados</div>
+  <button class="btn-gray" style="margin-top:28px" onclick="cerrar('mSent')">Cerrar</button>
+</div>
+
+<!-- MODAL AGREGAR VECINO -->
+<div class="modal hidden" id="mAdd">
+  <div class="mt">Agregar vecino</div>
+  <div class="ms">Aparece en la app de toda la cuadra al instante</div>
+  <div class="madd-fields">
+    <div><label class="field-label">Nombre</label><input class="field-input" id="aNombre" placeholder="Ej: Carlos" type="text"></div>
+    <div><label class="field-label">Apellido</label><input class="field-input" id="aApellido" placeholder="Ej: Pérez" type="text"></div>
+    <div><label class="field-label">Dirección</label><input class="field-input" id="aDireccion" placeholder="Ej: San Martín 823" type="text"></div>
   </div>
+  <button class="btn-red" onclick="guardarVecino()">Guardar vecino</button>
+  <button class="btn-gray" style="margin-top:10px" onclick="cerrar('mAdd')">Cancelar</button>
+</div>
 
-  <!-- MODAL: AGREGAR VECINO -->
-  <div class="modal modal-form oculto" id="modalAgregar">
-    <div class="modal-titulo">Agregar vecino</div>
-    <div class="modal-sub">El vecino va a aparecer en la app de toda la cuadra</div>
-    <div class="form-fields">
-      <div>
-        <label class="field-label">Nombre</label>
-        <input class="field-input" type="text" id="nuevoNombre" placeholder="Ej: Carlos">
-      </div>
-      <div>
-        <label class="field-label">Apellido</label>
-        <input class="field-input" type="text" id="nuevoApellido" placeholder="Ej: Pérez">
-      </div>
-      <div>
-        <label class="field-label">Dirección</label>
-        <input class="field-input" type="text" id="nuevaDireccion" placeholder="Ej: San Martín 823">
-      </div>
-    </div>
-    <button class="btn-guardar" onclick="guardarVecino()">Guardar vecino</button>
-    <button class="btn-cancelar" onclick="cerrarModal('modalAgregar')">Cancelar</button>
+<!-- PANTALLA BIENVENIDA -->
+<div class="page active" id="page-bienvenida">
+  <div class="logo-wrap">
+    <img src="icon-192.png" class="logo-img" onerror="this.style.display='none';document.getElementById('logoFallback').style.display='flex'">
+    <div class="logo-fallback" id="logoFallback" style="display:none">🛡️</div>
+    <h1>BARRIO SEGURO</h1>
+    <p>Red vecinal de seguridad</p>
   </div>
-
-  <!-- LOGIN -->
-  <div class="page active" id="page-login">
-    <div class="login-logo">
-      <div class="shield-icon"><img src="icon-192.png" style="width:70px;height:70px;border-radius:14px;object-fit:cover;" onerror="this.style.display='none';this.parentNode.innerHTML='🛡️'"></div>
-      <h1>BARRIO SEGURO</h1>
-      <p>Red vecinal de tu cuadra</p>
-    </div>
-    <div class="login-form">
-      <div>
-        <label class="field-label">Tu dirección</label>
-        <input class="field-input" type="text" placeholder="Ej: San Martín 823" id="inputDir">
-      </div>
-      <div>
-        <label class="field-label">Contraseña</label>
-        <input class="field-input" type="password" placeholder="••••••••" id="inputPass">
-      </div>
-      <div class="error-msg" id="errorMsg">Dirección o contraseña incorrecta</div>
-      <button class="btn-ingresar" onclick="ingresar()">INGRESAR</button>
-      <div class="login-nota">¿No tenés acceso? Pedíselo al administrador de tu cuadra</div>
-    </div>
+  <div class="bienvenida-btns">
+    <button class="btn-red" onclick="irA('login')">Ya tengo una cuadra — Ingresar</button>
+    <button class="btn-gray" onclick="irA('crear')">Crear una cuadra nueva</button>
+    <button class="btn-gray" style="font-size:13px;color:#555577;padding:12px" onclick="irA('saLogin')">Acceso administrador general</button>
   </div>
+</div>
 
-  <!-- HOME -->
-  <div class="page" id="page-home">
-    <div class="top-bar">
-      <div>
-        <div class="bienvenida" id="nombreUsuario">Bienvenido</div>
-        <div class="direccion" id="dirUsuario"></div>
-      </div>
-      <div class="online-badge">
-        <div class="dot-verde"></div>
-        <span id="contOnline">...</span>
-      </div>
+<!-- PANTALLA LOGIN -->
+<div class="page" id="page-login">
+  <button class="login-back" onclick="irA('bienvenida')">← Volver</button>
+  <div class="login-titulo">Ingresar a mi cuadra</div>
+  <div class="login-sub">Pedile el código a tu administrador</div>
+  <div class="login-form">
+    <div><label class="field-label">Código de cuadra</label><input class="field-input" id="lCodigo" placeholder="Ej: SM823" type="text" style="text-transform:uppercase;letter-spacing:3px"></div>
+    <div><label class="field-label">Tu nombre</label><input class="field-input" id="lNombre" placeholder="Ej: Carlos Pérez" type="text"></div>
+    <div id="errorLogin" class="error-msg">Código de cuadra incorrecto</div>
+    <button class="btn-red" onclick="ingresar()">INGRESAR</button>
+  </div>
+</div>
+
+<!-- PANTALLA CREAR CUADRA -->
+<div class="page" id="page-crear">
+  <button class="login-back" onclick="irA('bienvenida')">← Volver</button>
+  <div class="login-titulo">Crear mi cuadra</div>
+  <div class="login-sub">Vas a ser el administrador</div>
+  <div class="crear-form">
+    <div><label class="field-label">Tu nombre completo</label><input class="field-input" id="cNombre" placeholder="Ej: Carlos Pérez" type="text"></div>
+    <div><label class="field-label">Nombre de la cuadra</label><input class="field-input" id="cCuadra" placeholder="Ej: San Martín al 800" type="text"></div>
+    <div><label class="field-label">Tu dirección</label><input class="field-input" id="cDireccion" placeholder="Ej: San Martín 823" type="text"></div>
+    <div id="errorCrear" class="error-msg">Completá todos los campos</div>
+    <button class="btn-red" onclick="crearCuadra()">CREAR MI CUADRA</button>
+  </div>
+</div>
+
+<!-- PANTALLA HOME -->
+<div class="page" id="page-home">
+  <div class="top-bar">
+    <div>
+      <div class="top-nombre" id="hNombre">Bienvenido</div>
+      <div class="top-dir" id="hDir"></div>
     </div>
-    <div class="scroll">
-      <div class="home-content">
-        <button class="btn-alerta" onclick="abrirTipo()">
-          <div class="pulso"></div>
-          <div class="alerta-inner">
-            <span class="alerta-icono">🚨</span>
-            <span class="alerta-titulo">ACTIVAR ALERTA</span>
-            <span class="alerta-subtitulo">Tocá acá para avisar a todos los vecinos</span>
-          </div>
-        </button>
-        <button class="btn-911" onclick="llamar('911')">
-          <span class="btn-911-icono">👮</span>
-          <div>
-            <div class="btn-911-label">Llamar al 911</div>
-            <div class="btn-911-sub">Policía — emergencia</div>
-          </div>
-        </button>
-        <div class="seccion-titulo">Vecinos de la cuadra</div>
-        <div class="vecinos-lista" id="listaVecinos">
-          <div class="loading">Cargando vecinos...</div>
+    <div class="online-pill"><div class="dot"></div><span id="hOnline">...</span></div>
+  </div>
+  <div class="scroll">
+    <div class="home-content">
+      <button class="btn-alerta" onclick="abrirTipo()">
+        <div class="pulso"></div>
+        <div class="ai">
+          <span class="ai-ico">🚨</span>
+          <span class="ai-t">ACTIVAR ALERTA</span>
+          <span class="ai-s">Tocá para avisar a todos los vecinos</span>
         </div>
-      </div>
-    </div>
-    <div class="bottom-nav" id="navHome">
-      <div class="nav-btn activo" onclick="irA('home')">
-        <span class="nav-ico">🏠</span><div class="nav-punto"></div><span class="nav-txt">Inicio</span>
-      </div>
-      <div class="nav-btn" id="navAdminBtn" onclick="irA('admin')" style="display:none">
-        <span class="nav-ico">⚙️</span><div class="nav-punto"></div><span class="nav-txt">Admin</span>
-      </div>
-      <div class="nav-btn" onclick="doLogout()">
-        <span class="nav-ico">🚪</span><div class="nav-punto"></div><span class="nav-txt">Salir</span>
-      </div>
+      </button>
+      <button class="btn-911w" onclick="llamar911()">
+        <span class="b9i">👮</span>
+        <div><div class="b9t">Llamar al 911</div><div class="b9s">Policía — emergencia</div></div>
+      </button>
+      <div class="sec-label">Vecinos de la cuadra</div>
+      <div class="vcards" id="hVecinos"><div class="cargando">Cargando vecinos...</div></div>
     </div>
   </div>
+  <div class="bnav" id="navHome">
+    <div class="nb on" onclick="irA('home')"><span class="ni">🏠</span><div class="np"></div><span class="nt">Inicio</span></div>
+    <div class="nb" id="navAdminBtn" onclick="irA('admin')" style="display:none"><span class="ni">⚙️</span><div class="np"></div><span class="nt">Admin</span></div>
+    <div class="nb" onclick="salir()"><span class="ni">🚪</span><div class="np"></div><span class="nt">Salir</span></div>
+  </div>
+</div>
 
-  <!-- ADMIN -->
-  <div class="page" id="page-admin">
-    <div class="page-header">
-      <div>
-        <h1>Administrador</h1>
-        <p id="adminCuadra">Cuadra</p>
+<!-- PANTALLA ADMIN -->
+<div class="page" id="page-admin">
+  <div class="ph">
+    <div><h1>Administrador</h1><p id="adminNombreCuadra"></p></div>
+    <span class="badge badge-blue">Admin</span>
+  </div>
+  <div class="scroll">
+    <div class="admin-content">
+      <div class="codigo-box">
+        <div class="codigo-label">Código de tu cuadra</div>
+        <div class="codigo-val" id="adminCodigo"></div>
+        <div class="codigo-hint">Compartí este código con tus vecinos para que puedan unirse</div>
       </div>
-      <span class="badge-admin">Admin</span>
-    </div>
-    <div class="scroll">
-      <div class="admin-content">
-        <button class="btn-agregar" onclick="abrirAgregar()">
-          ➕ Agregar vecino nuevo
-        </button>
-        <div id="listaAdmin">
-          <div class="loading">Cargando...</div>
-        </div>
-      </div>
-    </div>
-    <div class="bottom-nav">
-      <div class="nav-btn" onclick="irA('home')">
-        <span class="nav-ico">🏠</span><div class="nav-punto"></div><span class="nav-txt">Inicio</span>
-      </div>
-      <div class="nav-btn activo" onclick="irA('admin')">
-        <span class="nav-ico">⚙️</span><div class="nav-punto"></div><span class="nav-txt">Admin</span>
-      </div>
-      <div class="nav-btn" onclick="doLogout()">
-        <span class="nav-ico">🚪</span><div class="nav-punto"></div><span class="nav-txt">Salir</span>
-      </div>
+      <button class="btn-compartir" onclick="compartirCodigo()">📤 Compartir código por WhatsApp</button>
+      <button class="btn-add" onclick="abrirAgregar()">➕ Agregar vecino</button>
+      <div id="adminLista"><div class="cargando">Cargando...</div></div>
     </div>
   </div>
+  <div class="bnav">
+    <div class="nb" onclick="irA('home')"><span class="ni">🏠</span><div class="np"></div><span class="nt">Inicio</span></div>
+    <div class="nb on" onclick="irA('admin')"><span class="ni">⚙️</span><div class="np"></div><span class="nt">Admin</span></div>
+    <div class="nb" onclick="salir()"><span class="ni">🚪</span><div class="np"></div><span class="nt">Salir</span></div>
+  </div>
+</div>
+
+
+<!-- SUPERADMIN LOGIN -->
+<div class="page" id="page-saLogin">
+  <button class="login-back" onclick="irA('bienvenida')">← Volver</button>
+  <div class="login-titulo">Administrador general</div>
+  <div class="login-sub">Solo para el dueño de la plataforma</div>
+  <div class="login-form" style="margin-top:20px">
+    <div><label class="field-label">Contraseña maestra</label><input class="field-input" id="saPass" type="password" placeholder="••••••••"></div>
+    <div id="errorSA" class="error-msg">Contraseña incorrecta</div>
+    <button class="btn-red" onclick="loginSuperAdmin()">INGRESAR</button>
+  </div>
+</div>
+
+<!-- SUPERADMIN PANEL -->
+<div class="page" id="page-superadmin">
+  <div class="ph">
+    <div><h1>Panel General</h1><p>Barrio Seguro</p></div>
+    <span class="badge badge-red">Super Admin</span>
+  </div>
+  <div class="scroll">
+    <div class="sa-content">
+      <div class="sa-stats">
+        <div class="sa-stat"><span class="sa-stat-n" id="saTotalCuadras">0</span><span class="sa-stat-l">Cuadras</span></div>
+        <div class="sa-stat"><span class="sa-stat-n" id="saTotalVecinos">0</span><span class="sa-stat-l">Vecinos</span></div>
+      </div>
+      <button class="btn-red" onclick="abrirCrearCuadra()">➕ Crear cuadra nueva</button>
+      <div id="saCuadrasList"><div class="cargando">Cargando cuadras...</div></div>
+    </div>
+  </div>
+  <div class="bnav">
+    <div class="nb" onclick="salir()"><span class="ni">🚪</span><div class="np"></div><span class="nt">Salir</span></div>
+  </div>
+</div>
+
+<!-- MODAL CREAR CUADRA (SUPERADMIN) -->
+<div class="modal hidden" id="mCrearCuadra">
+  <div class="mt">Nueva cuadra</div>
+  <div class="ms">Creá la cuadra y mandá el código al administrador</div>
+  <div class="msa-fields">
+    <div><label class="field-label">Nombre de la cuadra</label><input class="field-input" id="scNombre" placeholder="Ej: San Martín al 800" type="text"></div>
+    <div><label class="field-label">Nombre del administrador</label><input class="field-input" id="scAdmin" placeholder="Ej: Carlos Pérez" type="text"></div>
+    <div><label class="field-label">Teléfono del admin (opcional)</label><input class="field-input" id="scTel" placeholder="Ej: 2236123456" type="tel"></div>
+  </div>
+  <button class="btn-red" onclick="crearCuadraSA()">Crear y generar código</button>
+  <button class="btn-gray" style="margin-top:10px" onclick="cerrar('mCrearCuadra')">Cancelar</button>
+</div>
 
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { getFirestore, collection, doc, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, query, where, orderBy } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAec7FF9qM5rCXYOwDTgd1CoAY7WvEyK9s",
@@ -340,201 +420,207 @@ const firebaseConfig = {
   appId: "1:863945266838:web:3ce88db7c3302b0ed914b7"
 };
 
-const firebaseApp = initializeApp(firebaseConfig);
-const db = getFirestore(firebaseApp);
-
-// ADMIN PASSWORD — cambiala cuando quieras
-const ADMIN_PASSWORD = 'admin123';
-const VECINO_PASSWORD_OLD = 'barrio2024';
-const VECINO_PASSWORD = 'barrio2024';
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 const COLORES = [
-  {bg:'rgba(45,106,79,0.2)',txt:'#68d391'},
-  {bg:'rgba(26,54,93,0.2)',txt:'#90cdf4'},
-  {bg:'rgba(68,51,122,0.2)',txt:'#d6bcfa'},
-  {bg:'rgba(123,52,30,0.2)',txt:'#fbd38d'},
-  {bg:'rgba(44,74,46,0.2)',txt:'#9ae6b4'},
-  {bg:'rgba(92,43,41,0.2)',txt:'#fc8181'},
+  {bg:'rgba(45,106,79,0.2)',txt:'#68d391'},{bg:'rgba(26,54,93,0.2)',txt:'#90cdf4'},
+  {bg:'rgba(68,51,122,0.2)',txt:'#d6bcfa'},{bg:'rgba(123,52,30,0.2)',txt:'#fbd38d'},
+  {bg:'rgba(44,74,46,0.2)',txt:'#9ae6b4'},{bg:'rgba(92,43,41,0.2)',txt:'#fc8181'},
 ];
 
-let esAdmin = false;
-let vecinosCache = [];
+let sesion = null;
+let unsubVecinos = null;
 
-// ===== SESION GUARDADA =====
-function guardarSesion(dir, admin) {
-  localStorage.setItem('bs_sesion', JSON.stringify({ dir, esAdmin: admin }));
+// ===== NAVEGACION =====
+window.irA = function(p) {
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+  document.getElementById('page-' + p).classList.add('active');
 }
 
-function verificarSesion() {
+window.cerrar = function(id) {
+  document.getElementById(id).classList.add('hidden');
+}
+
+// ===== SESION =====
+function cargarSesion() {
   try {
-    const sesion = localStorage.getItem('bs_sesion');
-    if (sesion) {
-      const datos = JSON.parse(sesion);
-      esAdmin = datos.esAdmin;
-      document.getElementById('nombreUsuario').textContent = datos.dir;
-      document.getElementById('dirUsuario').textContent = 'En linea';
-      document.getElementById('adminCuadra').textContent = datos.dir;
-      if (esAdmin) document.getElementById('navAdminBtn').style.display = 'flex';
-      irA('home');
-      escucharVecinos();
+    const s = localStorage.getItem('bs_v2');
+    if (s) {
+      sesion = JSON.parse(s);
+      arrancarApp();
     }
   } catch(e) {}
 }
 
-// ===== NAVEGACION =====
-window.irA = function(pagina) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + pagina).classList.add('active');
+function guardarSesion() {
+  localStorage.setItem('bs_v2', JSON.stringify(sesion));
 }
 
-// ===== LOGIN =====
-window.ingresar = function() {
-  const dir = document.getElementById('inputDir').value.trim();
-  const pass = document.getElementById('inputPass').value.trim();
-  if (!dir) return;
+window.salir = function() {
+  localStorage.removeItem('bs_v2');
+  sesion = null;
+  if (unsubVecinos) { unsubVecinos(); unsubVecinos = null; }
+  irA('bienvenida');
+}
 
-  if (pass === ADMIN_PASSWORD) {
-    esAdmin = true;
-  } else if (pass === VECINO_PASSWORD) {
-    esAdmin = false;
-  } else {
-    document.getElementById('errorMsg').style.display = 'block';
+// ===== CREAR CUADRA =====
+window.crearCuadra = async function() {
+  const nombre = document.getElementById('cNombre').value.trim();
+  const cuadra = document.getElementById('cCuadra').value.trim();
+  const direccion = document.getElementById('cDireccion').value.trim();
+  if (!nombre || !cuadra || !direccion) {
+    document.getElementById('errorCrear').style.display = 'block';
     return;
   }
-
-  document.getElementById('errorMsg').style.display = 'none';
-  document.getElementById('nombreUsuario').textContent = dir;
-  document.getElementById('dirUsuario').textContent = 'En línea';
-  document.getElementById('adminCuadra').textContent = dir;
-
-  if (esAdmin) {
-    document.getElementById('navAdminBtn').style.display = 'flex';
+  // Generar código único de 6 caracteres
+  const codigo = generarCodigo(cuadra);
+  try {
+    // Crear cuadra en Firestore
+    await setDoc(doc(db, 'cuadras', codigo), {
+      nombre: cuadra, adminNombre: nombre, adminDir: direccion, codigo, creada: new Date().toISOString()
+    });
+    // Agregar admin como primer vecino
+    await addDoc(collection(db, 'cuadras', codigo, 'vecinos'), {
+      nombre, apellido: '', direccion, esAdmin: true
+    });
+    sesion = { codigo, nombre, direccion, esAdmin: true, nombreCuadra: cuadra };
+    guardarSesion();
+    arrancarApp();
+  } catch(e) {
+    alert('Error al crear. Verificá tu conexión.');
   }
+}
 
-  guardarSesion(dir, esAdmin);
+function generarCodigo(cuadra) {
+  const palabras = cuadra.toUpperCase().split(' ').filter(p => p.length > 2);
+  const base = palabras.map(p => p[0]).join('').slice(0, 3);
+  const num = Math.floor(100 + Math.random() * 900);
+  return (base || 'BS') + num;
+}
+
+// ===== INGRESAR A CUADRA =====
+window.ingresar = async function() {
+  const codigo = document.getElementById('lCodigo').value.trim().toUpperCase();
+  const nombre = document.getElementById('lNombre').value.trim();
+  if (!codigo || !nombre) return;
+  try {
+    const cuadraDoc = await getDoc(doc(db, 'cuadras', codigo));
+    if (!cuadraDoc.exists()) {
+      document.getElementById('errorLogin').style.display = 'block';
+      return;
+    }
+    const cuadra = cuadraDoc.data();
+    sesion = { codigo, nombre, direccion: '', esAdmin: false, nombreCuadra: cuadra.nombre };
+    guardarSesion();
+    arrancarApp();
+  } catch(e) {
+    alert('Error de conexión. Intentá de nuevo.');
+  }
+}
+
+// ===== ARRANCAR APP =====
+function arrancarApp() {
+  document.getElementById('hNombre').textContent = sesion.nombre;
+  document.getElementById('hDir').textContent = sesion.nombreCuadra;
+  document.getElementById('adminNombreCuadra').textContent = sesion.nombreCuadra;
+  document.getElementById('adminCodigo').textContent = sesion.codigo;
+  if (sesion.esAdmin) document.getElementById('navAdminBtn').style.display = 'flex';
   irA('home');
   escucharVecinos();
 }
 
-window.doLogout = function() {
-  localStorage.removeItem('bs_sesion');
-  esAdmin = false;
-  document.getElementById('navAdminBtn').style.display = 'none';
-  document.getElementById('inputDir').value = '';
-  document.getElementById('inputPass').value = '';
-  irA('login');
-  document.getElementById('page-login').classList.add('active');
-}
-
-// ===== FIRESTORE: ESCUCHAR VECINOS EN TIEMPO REAL =====
+// ===== ESCUCHAR VECINOS EN TIEMPO REAL =====
 function escucharVecinos() {
-  const q = query(collection(db, 'vecinos'), orderBy('nombre'));
-  onSnapshot(q, (snapshot) => {
-    vecinosCache = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderVecinos();
-    renderAdmin();
-    document.getElementById('contOnline').textContent = vecinosCache.length + ' vecinos';
-    document.getElementById('contadorVecinos').textContent = vecinosCache.length;
+  if (unsubVecinos) unsubVecinos();
+  const q = query(collection(db, 'cuadras', sesion.codigo, 'vecinos'), orderBy('nombre'));
+  unsubVecinos = onSnapshot(q, (snap) => {
+    const vecinos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderVecinos(vecinos);
+    renderAdmin(vecinos);
+    document.getElementById('hOnline').textContent = vecinos.length + ' vecinos';
+    document.getElementById('sentN').textContent = vecinos.length;
   });
 }
 
-// ===== RENDER VECINOS =====
-function renderVecinos() {
-  const lista = document.getElementById('listaVecinos');
-  if (vecinosCache.length === 0) {
-    lista.innerHTML = '<div class="loading">No hay vecinos cargados aún</div>';
-    return;
-  }
-  lista.innerHTML = vecinosCache.map((v, i) => {
+function renderVecinos(vecinos) {
+  const el = document.getElementById('hVecinos');
+  if (!vecinos.length) { el.innerHTML = '<div class="cargando">No hay vecinos aún</div>'; return; }
+  el.innerHTML = vecinos.map((v, i) => {
     const col = COLORES[i % COLORES.length];
     const ini = ((v.nombre||'')[0]||'') + ((v.apellido||'')[0]||'');
-    return `
-      <div class="vecino-card">
-        <div class="vecino-avatar" style="background:${col.bg};color:${col.txt}">${ini.toUpperCase()}</div>
-        <div>
-          <div class="vecino-nombre">${v.nombre} ${v.apellido}</div>
-          <div class="vecino-dir">${v.direccion}</div>
-        </div>
-        <div class="vecino-estado st-online"></div>
-      </div>
-    `;
+    return `<div class="vcard">
+      <div class="vavatar" style="background:${col.bg};color:${col.txt}">${ini.toUpperCase()}</div>
+      <div><div class="vnombre">${v.nombre} ${v.apellido||''}</div><div class="vdir">${v.direccion||''}</div></div>
+      <div class="vdot von"></div>
+    </div>`;
   }).join('');
 }
 
-// ===== RENDER ADMIN =====
-function renderAdmin() {
-  const lista = document.getElementById('listaAdmin');
-  if (vecinosCache.length === 0) {
-    lista.innerHTML = '<div class="loading">Todavía no hay vecinos — agregá el primero</div>';
-    return;
-  }
-  lista.innerHTML = vecinosCache.map((v, i) => {
+function renderAdmin(vecinos) {
+  const el = document.getElementById('adminLista');
+  if (!vecinos.length) { el.innerHTML = '<div class="cargando">Agregá el primer vecino</div>'; return; }
+  el.innerHTML = vecinos.map((v, i) => {
     const col = COLORES[i % COLORES.length];
     const ini = ((v.nombre||'')[0]||'') + ((v.apellido||'')[0]||'');
-    return `
-      <div class="admin-vecino">
-        <div class="vecino-avatar" style="background:${col.bg};color:${col.txt};width:44px;height:44px;font-size:16px">${ini.toUpperCase()}</div>
-        <div class="admin-info">
-          <div class="admin-nombre">${v.nombre} ${v.apellido}</div>
-          <div class="admin-dir">${v.direccion}</div>
-        </div>
-        <button class="btn-eliminar" onclick="eliminarVecino('${v.id}', '${v.nombre}')">🗑️</button>
-      </div>
-    `;
+    return `<div class="admin-vec">
+      <div class="vavatar" style="background:${col.bg};color:${col.txt};width:42px;height:42px;font-size:15px">${ini.toUpperCase()}</div>
+      <div class="av-info"><div class="av-nombre">${v.nombre} ${v.apellido||''}</div><div class="av-dir">${v.direccion||''}</div></div>
+      ${!v.esAdmin ? `<button class="btn-del" onclick="eliminarVecino('${v.id}')">🗑️</button>` : '<span class="badge badge-blue" style="font-size:11px">Admin</span>'}
+    </div>`;
   }).join('');
 }
 
 // ===== AGREGAR VECINO =====
 window.abrirAgregar = function() {
-  document.getElementById('nuevoNombre').value = '';
-  document.getElementById('nuevoApellido').value = '';
-  document.getElementById('nuevaDireccion').value = '';
-  document.getElementById('modalAgregar').classList.remove('oculto');
+  document.getElementById('aNombre').value = '';
+  document.getElementById('aApellido').value = '';
+  document.getElementById('aDireccion').value = '';
+  document.getElementById('mAdd').classList.remove('hidden');
 }
 
 window.guardarVecino = async function() {
-  const nombre = document.getElementById('nuevoNombre').value.trim();
-  const apellido = document.getElementById('nuevoApellido').value.trim();
-  const direccion = document.getElementById('nuevaDireccion').value.trim();
-  if (!nombre || !apellido || !direccion) {
-    alert('Completá todos los campos');
-    return;
-  }
+  const nombre = document.getElementById('aNombre').value.trim();
+  const apellido = document.getElementById('aApellido').value.trim();
+  const direccion = document.getElementById('aDireccion').value.trim();
+  if (!nombre || !direccion) { alert('Completá nombre y dirección'); return; }
   try {
-    await addDoc(collection(db, 'vecinos'), { nombre, apellido, direccion, activo: true });
-    cerrarModal('modalAgregar');
-  } catch(e) {
-    alert('Error al guardar. Verificá tu conexión.');
-  }
+    await addDoc(collection(db, 'cuadras', sesion.codigo, 'vecinos'), { nombre, apellido, direccion, esAdmin: false });
+    cerrar('mAdd');
+  } catch(e) { alert('Error al guardar'); }
 }
 
 // ===== ELIMINAR VECINO =====
-window.eliminarVecino = async function(id, nombre) {
-  if (!confirm(`¿Eliminar a ${nombre} de la cuadra?`)) return;
+window.eliminarVecino = async function(id) {
+  if (!confirm('¿Eliminar este vecino?')) return;
   try {
-    await deleteDoc(doc(db, 'vecinos', id));
-  } catch(e) {
-    alert('Error al eliminar.');
+    await deleteDoc(doc(db, 'cuadras', sesion.codigo, 'vecinos', id));
+  } catch(e) { alert('Error al eliminar'); }
+}
+
+// ===== COMPARTIR CODIGO =====
+window.compartirCodigo = function() {
+  const msg = `🛡️ *Barrio Seguro*\nTe invito a unirte a la red de seguridad de nuestra cuadra.\n\n1. Abrí esta dirección en Chrome:\nmerlojonatan1984.github.io/BARRIO-SEGURO/index.html\n\n2. Tocá "Ya tengo una cuadra"\n\n3. Ingresá el código: *${sesion.codigo}*\n\n¡Ya vas a ver a todos los vecinos!`;
+  if (navigator.share) {
+    navigator.share({ text: msg });
+  } else {
+    window.open('https://wa.me/?text=' + encodeURIComponent(msg));
   }
 }
 
 // ===== ALERTA =====
 window.abrirTipo = function() {
-  document.getElementById('modalTipo').classList.remove('oculto');
+  document.getElementById('mTipo').classList.remove('hidden');
 }
 
 window.enviarAlerta = function(tipo) {
-  cerrarModal('modalTipo');
-  document.getElementById('modalEnviada').classList.remove('oculto');
+  cerrar('mTipo');
+  document.getElementById('mSent').classList.remove('hidden');
   sonarAlarma();
 }
 
-window.cerrarModal = function(id) {
-  document.getElementById(id).classList.add('oculto');
-}
-
-window.llamar = function(num) {
-  window.location.href = 'tel:' + num;
+window.llamar911 = function() {
+  window.location.href = 'tel:911';
 }
 
 // ===== ALARMA =====
@@ -542,8 +628,7 @@ function sonarAlarma() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     [[880,0],[660,0.2],[880,0.4],[660,0.6],[880,0.8]].forEach(([f,t]) => {
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
+      const o = ctx.createOscillator(), g = ctx.createGain();
       o.connect(g); g.connect(ctx.destination);
       o.frequency.value = f; o.type = 'square';
       g.gain.setValueAtTime(0.3, ctx.currentTime+t);
@@ -552,7 +637,121 @@ function sonarAlarma() {
     });
   } catch(e){}
 }
-verificarSesion();
+
+
+// ===== SUPERADMIN =====
+const SA_PASSWORD = 'BS2024super'; // Cambiala por una contraseña segura
+
+window.loginSuperAdmin = function() {
+  const pass = document.getElementById('saPass').value;
+  if (pass !== SA_PASSWORD) {
+    document.getElementById('errorSA').style.display = 'block';
+    return;
+  }
+  document.getElementById('errorSA').style.display = 'none';
+  irA('superadmin');
+  cargarTodasCuadras();
+}
+
+async function cargarTodasCuadras() {
+  try {
+    const { getDocs } = await import("https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js");
+    const snap = await getDocs(collection(db, 'cuadras'));
+    const cuadras = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    document.getElementById('saTotalCuadras').textContent = cuadras.length;
+    
+    let totalVecinos = 0;
+    const lista = document.getElementById('saCuadrasList');
+    
+    if (cuadras.length === 0) {
+      lista.innerHTML = '<div class="cargando">No hay cuadras creadas aún</div>';
+      return;
+    }
+
+    lista.innerHTML = cuadras.map(c => `
+      <div class="cuadra-card">
+        <div class="cc-top">
+          <div class="cc-nombre">${c.nombre}</div>
+          <div class="cc-codigo">${c.codigo}</div>
+        </div>
+        <div class="cc-info">Admin: ${c.adminNombre || 'Sin asignar'} · ${c.adminDir || ''}</div>
+        <div class="cc-btns">
+          <button class="btn-wa" onclick="mandarCodigo('${c.codigo}','${c.nombre}','${c.adminNombre||''}','${c.adminTel||''}')">📤 Mandar código</button>
+          <button class="btn-del-c" onclick="eliminarCuadra('${c.codigo}')">🗑️</button>
+        </div>
+      </div>
+    `).join('');
+    
+    document.getElementById('saTotalVecinos').textContent = totalVecinos;
+  } catch(e) {
+    console.log('Error:', e);
+  }
+}
+
+window.abrirCrearCuadra = function() {
+  document.getElementById('scNombre').value = '';
+  document.getElementById('scAdmin').value = '';
+  document.getElementById('scTel').value = '';
+  document.getElementById('mCrearCuadra').classList.remove('hidden');
+}
+
+window.crearCuadraSA = async function() {
+  const nombre = document.getElementById('scNombre').value.trim();
+  const adminNombre = document.getElementById('scAdmin').value.trim();
+  const adminTel = document.getElementById('scTel').value.trim();
+  if (!nombre || !adminNombre) { alert('Completá nombre de cuadra y administrador'); return; }
+  
+  const codigo = generarCodigo(nombre);
+  try {
+    await setDoc(doc(db, 'cuadras', codigo), {
+      nombre, adminNombre, adminTel, codigo,
+      paga: false, creada: new Date().toISOString()
+    });
+    cerrar('mCrearCuadra');
+    cargarTodasCuadras();
+    // Mostrar el código generado
+    setTimeout(() => {
+      alert(`✅ Cuadra creada!
+
+Código: ${codigo}
+
+Ya podés mandárselo al administrador.`);
+    }, 300);
+  } catch(e) { alert('Error al crear cuadra'); }
+}
+
+window.eliminarCuadra = async function(codigo) {
+  if (!confirm(`¿Eliminar la cuadra ${codigo}? Se borran todos sus vecinos.`)) return;
+  try {
+    await deleteDoc(doc(db, 'cuadras', codigo));
+    cargarTodasCuadras();
+  } catch(e) { alert('Error al eliminar'); }
+}
+
+window.mandarCodigo = function(codigo, nombreCuadra, adminNombre, tel) {
+  const msg = `🛡️ *Barrio Seguro*
+
+Hola ${adminNombre}! Tu cuadra está lista.
+
+📍 Cuadra: *${nombreCuadra}*
+🔑 Código: *${codigo}*
+
+*Pasos para ingresar:*
+1. Abrí Chrome en tu celular
+2. Entrá a: merlojonatan1984.github.io/BARRIO-SEGURO/index.html
+3. Tocá "Ya tengo una cuadra"
+4. Ingresá el código: *${codigo}*
+
+¡Cualquier duda me avisás!`;
+  const url = tel 
+    ? `https://wa.me/54${tel}?text=${encodeURIComponent(msg)}`
+    : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+  window.open(url);
+}
+
+
+// ARRANCAR
+cargarSesion();
 </script>
 </body>
 </html>
