@@ -226,7 +226,7 @@
   <!-- LOGIN -->
   <div class="page active" id="page-login">
     <div class="login-logo">
-      <div class="shield-icon">🛡️</div>
+      <div class="shield-icon"><img src="icon-192.png" style="width:70px;height:70px;border-radius:14px;object-fit:cover;" onerror="this.style.display='none';this.parentNode.innerHTML='🛡️'"></div>
       <h1>BARRIO SEGURO</h1>
       <p>Red vecinal de tu cuadra</p>
     </div>
@@ -345,6 +345,7 @@ const db = getFirestore(firebaseApp);
 
 // ADMIN PASSWORD — cambiala cuando quieras
 const ADMIN_PASSWORD = 'admin123';
+const VECINO_PASSWORD_OLD = 'barrio2024';
 const VECINO_PASSWORD = 'barrio2024';
 
 const COLORES = [
@@ -358,6 +359,27 @@ const COLORES = [
 
 let esAdmin = false;
 let vecinosCache = [];
+
+// ===== SESION GUARDADA =====
+function guardarSesion(dir, admin) {
+  localStorage.setItem('bs_sesion', JSON.stringify({ dir, esAdmin: admin }));
+}
+
+function verificarSesion() {
+  try {
+    const sesion = localStorage.getItem('bs_sesion');
+    if (sesion) {
+      const datos = JSON.parse(sesion);
+      esAdmin = datos.esAdmin;
+      document.getElementById('nombreUsuario').textContent = datos.dir;
+      document.getElementById('dirUsuario').textContent = 'En linea';
+      document.getElementById('adminCuadra').textContent = datos.dir;
+      if (esAdmin) document.getElementById('navAdminBtn').style.display = 'flex';
+      irA('home');
+      escucharVecinos();
+    }
+  } catch(e) {}
+}
 
 // ===== NAVEGACION =====
 window.irA = function(pagina) {
@@ -389,11 +411,13 @@ window.ingresar = function() {
     document.getElementById('navAdminBtn').style.display = 'flex';
   }
 
+  guardarSesion(dir, esAdmin);
   irA('home');
   escucharVecinos();
 }
 
 window.doLogout = function() {
+  localStorage.removeItem('bs_sesion');
   esAdmin = false;
   document.getElementById('navAdminBtn').style.display = 'none';
   document.getElementById('inputDir').value = '';
@@ -528,6 +552,7 @@ function sonarAlarma() {
     });
   } catch(e){}
 }
+verificarSesion();
 </script>
 </body>
 </html>
