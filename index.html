@@ -448,7 +448,7 @@ button { cursor:pointer; border:none; background:none; font-family:inherit; }
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import { getFirestore, collection, doc, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { getFirestore, collection, doc, getDoc, setDoc, addDoc, deleteDoc, onSnapshot, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-messaging.js";
 
 const firebaseConfig = {
@@ -583,6 +583,8 @@ function generarCodigo(cuadra) {
 window.ingresar = async function() {
   const codigo = document.getElementById('lCodigo').value.trim().toUpperCase();
   const nombre = document.getElementById('lNombre').value.trim();
+  const direccion = document.getElementById('lDireccion').value.trim();
+  const pass = document.getElementById('lPass').value.trim();
   if (!codigo || !nombre) return;
   try {
     const cuadraDoc = await getDoc(doc(db, 'cuadras', codigo));
@@ -591,10 +593,36 @@ window.ingresar = async function() {
       return;
     }
     const cuadra = cuadraDoc.data();
-    sesion = { codigo, nombre, direccion: '', esAdmin: false, nombreCuadra: cuadra.nombre };
+    // Verificar si es admin de cuadra
+    let esAdminCuadra = false;
+    if (pass && cuadra.passAdmin && pass === cuadra.passAdmin) {
+      esAdminCuadra = true;
+    } else if (pass && pass !== cuadra.passAdmin) {
+      document.getElementById('errorLogin').style.display = 'block';
+      return;
+    }
+    // Auto-registrar vecino
+    const partes = nombre.trim().split(' ');
+    const primerNombre = partes[0];
+    const apellido = partes.slice(1).join(' ') || '';
+    const vecinosSnap = await getDocs(collection(db, 'cuadras', codigo, 'vecinos'));
+    const yaExiste = vecinosSnap.docs.some(d =>
+      (d.data().nombre + ' ' + (d.data().apellido||'')).toLowerCase().trim() === nombre.toLowerCase().trim()
+    );
+    if (!yaExiste) {
+      await addDoc(collection(db, 'cuadras', codigo, 'vecinos'), {
+        nombre: primerNombre,
+        apellido: apellido,
+        direccion: direccion || 'Sin dirección',
+        esAdmin: esAdminCuadra,
+        fechaIngreso: new Date().toISOString()
+      });
+    }
+    sesion = { codigo, nombre, direccion, esAdmin: esAdminCuadra, nombreCuadra: cuadra.nombre };
     guardarSesion();
     arrancarApp();
   } catch(e) {
+    console.log('Error:', e);
     alert('Error de conexión. Intentá de nuevo.');
   }
 }
